@@ -37,14 +37,15 @@ async def uploadFile(file: UploadFile):
     # Validate filename
     if not file.filename:
         raise HTTPException(status_code=400, detail="Invalid filename")
-    await MusicEngine.Get_tab(file)
+    mxml = await MusicEngine.Get_music_xml(file)
+    log.info(f"AAAAAAAAAAAAA: {mxml}")
     return {}
 
 
 if __name__ == "__main__":
     uvicorn.run(
         "main:app",
-        host="0.0.0.0",
+        host="127.0.0.1",
         port=8000,
         reload=True,
         reload_excludes=["./engine/processing/"],
