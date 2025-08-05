@@ -1,18 +1,16 @@
 import React, { useState } from "react";
-import {
-  Box,
-  Button,
-  Typography,
-  Paper,
-  LinearProgress,
-} from "@mui/material";
+import { Box, Button, Typography, Paper, LinearProgress } from "@mui/material";
 import { CloudUpload } from "@mui/icons-material";
 
 interface FileUploadProps {
   onFileSelect?: (file: File) => void;
+  isLoading?: boolean;
 }
 
-const FileUpload: React.FC<FileUploadProps> = ({ onFileSelect }) => {
+const FileUpload: React.FC<FileUploadProps> = ({
+  onFileSelect,
+  isLoading = false,
+}) => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [dragActive, setDragActive] = useState(false);
 
@@ -28,7 +26,7 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFileSelect }) => {
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     setDragActive(false);
-    
+
     const files = e.dataTransfer.files;
     if (files.length > 0) {
       handleFileSelect(files[0]);
@@ -67,11 +65,11 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFileSelect }) => {
       onDragLeave={handleDragLeave}
     >
       <CloudUpload sx={{ fontSize: 48, color: "#666", mb: 2 }} />
-      
+
       <Typography variant="h6" gutterBottom>
         Upload Audio File
       </Typography>
-      
+
       <Typography variant="body2" color="textSecondary" sx={{ mb: 2 }}>
         Drag and drop an audio file here, or click to browse.
       </Typography>
@@ -83,14 +81,23 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFileSelect }) => {
         type="file"
         onChange={handleFileInput}
       />
-      
+
       <label htmlFor="audio-file-input">
-        <Button variant="contained" component="span">
+        <Button variant="contained" component="span" disabled={isLoading}>
           Choose File
         </Button>
       </label>
 
-      {selectedFile && (
+      {isLoading && (
+        <Box sx={{ mt: 2 }}>
+          <LinearProgress />
+          <Typography variant="body2" color="primary" sx={{ mt: 1 }}>
+            Processing {selectedFile?.name || "audio file..."}
+          </Typography>
+        </Box>
+      )}
+
+      {selectedFile && !isLoading && (
         <Box sx={{ mt: 2 }}>
           <Typography variant="body2" color="primary">
             Selected: {selectedFile.name}

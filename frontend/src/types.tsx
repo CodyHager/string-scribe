@@ -1,3 +1,3 @@
-export interface FileUploadType{
-    file: File;
+export interface FileUploadType {
+  file: File;
 }

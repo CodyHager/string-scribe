@@ -1,1 +1,2 @@
-export const BACKEND_BASE = process.env.REACT_APP_BACKEND_BASE || 'http://localhost:8000';
+export const BACKEND_BASE =
+  process.env.REACT_APP_BACKEND_BASE || "http://localhost:8000";

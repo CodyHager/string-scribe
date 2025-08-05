@@ -38,8 +38,7 @@ async def uploadFile(file: UploadFile):
     if not file.filename:
         raise HTTPException(status_code=400, detail="Invalid filename")
     mxml = await MusicEngine.Get_music_xml(file)
-    log.info(f"AAAAAAAAAAAAA: {mxml}")
-    return {}
+    return {"mxml": mxml}
 
 
 if __name__ == "__main__":

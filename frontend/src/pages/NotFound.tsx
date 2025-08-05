@@ -17,11 +17,7 @@ const NotFound: React.FC = () => {
         <Typography variant="body1" color="textSecondary" sx={{ mb: 4 }}>
           The page you're looking for doesn't exist.
         </Typography>
-        <Button 
-          variant="contained" 
-          onClick={() => navigate("/")}
-          size="large"
-        >
+        <Button variant="contained" onClick={() => navigate("/")} size="large">
           Go Home
         </Button>
       </Box>
