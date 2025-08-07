@@ -1,6 +1,7 @@
-import { Container, Box } from "@mui/material";
+import { Container, Box, Button } from "@mui/material";
+import { PictureAsPdf } from "@mui/icons-material";
 import React, { useEffect, useState, useRef } from "react";
-import { OpenSheetMusicDisplay } from "opensheetmusicdisplay";
+import { OpenSheetMusicDisplay, OSMDOptions } from "opensheetmusicdisplay";
 
 interface MusicViewerProps {
   selectedMxml: string;
@@ -31,21 +32,41 @@ const MusicViewer = ({ selectedMxml }: MusicViewerProps) => {
     }
   }, [osmd, selectedMxml]);
 
+  const handleExportPdf = () => {
+    console.log("Export PDF clicked");
+    // TODO: Implement PDF export functionality
+  };
+
   return (
-    <Container
-      ref={containerRef}
-      sx={{
-        width: "100%",
-        minHeight: "400px",
-        border: selectedMxml !== "" ? "1px solid #ccc" : "none",
-        borderRadius: "4px",
-      }}
-    >
-      {selectedMxml === "" && (
-        <Box sx={{ p: 2, textAlign: "center", color: "text.secondary" }}>
-          No music selected
+    <Container sx={{ width: "100%" }}>
+      {selectedMxml !== "" && (
+        <Box sx={{ mb: 2, textAlign: "center" }}>
+          <Button
+            variant="contained"
+            startIcon={<PictureAsPdf />}
+            onClick={handleExportPdf}
+            sx={{ minWidth: 150 }}
+          >
+            Export PDF
+          </Button>
         </Box>
       )}
+
+      <Box
+        ref={containerRef}
+        sx={{
+          width: "100%",
+          minHeight: "400px",
+          border: selectedMxml !== "" ? "1px solid #ccc" : "none",
+          borderRadius: "4px",
+        }}
+      >
+        {selectedMxml === "" && (
+          <Box sx={{ p: 2, textAlign: "center", color: "text.secondary" }}>
+            No music selected
+          </Box>
+        )}
+      </Box>
     </Container>
   );
 };
