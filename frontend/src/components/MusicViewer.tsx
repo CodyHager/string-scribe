@@ -12,10 +12,8 @@ const MusicViewer = ({ selectedMxml }: MusicViewerProps) => {
 
   useEffect(() => {
     if (containerRef.current) {
-      //   console.log("init");
       const o = new OpenSheetMusicDisplay(containerRef.current);
       setOsmd(o);
-      //   console.log("done init");
     }
   }, []);
 
@@ -23,7 +21,6 @@ const MusicViewer = ({ selectedMxml }: MusicViewerProps) => {
     if (osmd && selectedMxml && selectedMxml !== "") {
       const renderMusic = async () => {
         try {
-          //   console.log("about to render");
           await osmd.load(selectedMxml);
           osmd.render();
         } catch (error) {
