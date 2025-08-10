@@ -26,20 +26,46 @@ const Home: React.FC = () => {
   };
 
   return (
-    <>
-      <Container maxWidth="sm" sx={{ mb: 2 }}>
-        <Box sx={{ mt: 4, textAlign: "center" }}>
-          <Typography variant="h4" component="h1" gutterBottom sx={{ mt: 4 }}>
-            Upload Audio
+    <Box sx={{ py: 4 }}>
+      <Container maxWidth="md">
+        <Box sx={{ textAlign: "center", mb: 6 }}>
+          <Typography
+            variant="h2"
+            component="h1"
+            gutterBottom
+            sx={{
+              mb: 3,
+              background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+              backgroundClip: "text",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              fontWeight: 700,
+            }}
+          >
+            Transform Audio to Sheet Music
           </Typography>
-          <Typography variant="body1" sx={{ mb: 4 }}>
-            Upload an audio file to generate violin sheet music
+          <Typography
+            variant="h5"
+            color="text.secondary"
+            sx={{
+              mb: 4,
+              fontWeight: 400,
+              maxWidth: 600,
+              mx: "auto",
+              lineHeight: 1.6,
+            }}
+          >
+            Upload an audio file and generate beautiful violin sheet music using
+            AI-powered transcription
           </Typography>
           <FileUpload onFileSelect={handleFileSelect} isLoading={isLoading} />
         </Box>
       </Container>
-      <MusicViewer selectedMxml={mxml}></MusicViewer>
-    </>
+
+      <Container maxWidth="lg">
+        <MusicViewer selectedMxml={mxml} />
+      </Container>
+    </Box>
   );
 };
 

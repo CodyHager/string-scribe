@@ -1,4 +1,10 @@
-import { Container, Box, Button, CircularProgress } from "@mui/material";
+import {
+  Container,
+  Box,
+  Button,
+  CircularProgress,
+  Typography,
+} from "@mui/material";
 import { PictureAsPdf } from "@mui/icons-material";
 import React, { useEffect, useState, useRef } from "react";
 import { OpenSheetMusicDisplay } from "opensheetmusicdisplay";
@@ -57,7 +63,7 @@ const MusicViewer = ({ selectedMxml }: MusicViewerProps) => {
   return (
     <Container sx={{ width: "100%" }}>
       {selectedMxml !== "" && (
-        <Box sx={{ mb: 2, textAlign: "center" }}>
+        <Box sx={{ mb: 4, textAlign: "center" }}>
           <Button
             variant="contained"
             startIcon={
@@ -69,7 +75,25 @@ const MusicViewer = ({ selectedMxml }: MusicViewerProps) => {
             }
             onClick={handleExportPdf}
             disabled={isExporting}
-            sx={{ minWidth: 150 }}
+            sx={{
+              background: "linear-gradient(135deg, #f50057 0%, #c51162 100%)",
+              fontSize: "1.1rem",
+              px: 4,
+              py: 1.5,
+              borderRadius: 3,
+              boxShadow: "0 4px 16px rgba(245, 0, 87, 0.3)",
+              "&:hover": {
+                background: "linear-gradient(135deg, #e6004c 0%, #b30d56 100%)",
+                boxShadow: "0 6px 24px rgba(245, 0, 87, 0.4)",
+                transform: "translateY(-2px)",
+              },
+              "&:disabled": {
+                background: "#e0e0e0",
+                color: "#9e9e9e",
+                boxShadow: "none",
+                transform: "none",
+              },
+            }}
           >
             {isExporting ? "Exporting..." : "Export PDF"}
           </Button>
@@ -80,14 +104,35 @@ const MusicViewer = ({ selectedMxml }: MusicViewerProps) => {
         ref={containerRef}
         sx={{
           width: "100%",
-          minHeight: "400px",
-          border: selectedMxml !== "" ? "1px solid #ccc" : "none",
-          borderRadius: "4px",
+          minHeight: "500px",
+          border:
+            selectedMxml !== "" ? "2px solid rgba(102, 126, 234, 0.2)" : "none",
+          backgroundColor: selectedMxml !== "" ? "white" : "transparent",
+          boxShadow:
+            selectedMxml !== "" ? "0 4px 20px rgba(0, 0, 0, 0.08)" : "none",
+          overflow: "hidden",
         }}
       >
         {selectedMxml === "" && (
-          <Box sx={{ p: 2, textAlign: "center", color: "text.secondary" }}>
-            No music selected
+          <Box
+            sx={{
+              p: 8,
+              textAlign: "center",
+              color: "text.secondary",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              minHeight: "500px",
+            }}
+          >
+            <PictureAsPdf sx={{ fontSize: 64, color: "#e0e0e0", mb: 2 }} />
+            <Typography variant="h6" color="text.secondary" gutterBottom>
+              No Music Selected
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Upload an audio file to see the generated sheet music here
+            </Typography>
           </Box>
         )}
       </Box>
