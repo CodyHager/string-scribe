@@ -1,7 +1,8 @@
-import { Container, Box, Button } from "@mui/material";
+import { Container, Box, Button, CircularProgress } from "@mui/material";
 import { PictureAsPdf } from "@mui/icons-material";
 import React, { useEffect, useState, useRef } from "react";
-import { OpenSheetMusicDisplay, OSMDOptions } from "opensheetmusicdisplay";
+import { OpenSheetMusicDisplay } from "opensheetmusicdisplay";
+import generatePDF from "react-to-pdf";
 
 interface MusicViewerProps {
   selectedMxml: string;
@@ -9,6 +10,7 @@ interface MusicViewerProps {
 
 const MusicViewer = ({ selectedMxml }: MusicViewerProps) => {
   const [osmd, setOsmd] = useState<OpenSheetMusicDisplay | null>(null);
+  const [isExporting, setIsExporting] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -32,9 +34,24 @@ const MusicViewer = ({ selectedMxml }: MusicViewerProps) => {
     }
   }, [osmd, selectedMxml]);
 
-  const handleExportPdf = () => {
-    console.log("Export PDF clicked");
-    // TODO: Implement PDF export functionality
+  const handleExportPdf = async () => {
+    try {
+      setIsExporting(true);
+      const rawTitle =
+        osmd?.GraphicSheet.Title.toString() || "string-scribe-export";
+      // Clean the filename by removing parentheses and their contents, extra spaces, and file extensions
+      const cleanTitle = rawTitle
+        .replace(/\([^)]*\)/g, "") // Remove anything in parentheses
+        .replace(/\.(mid|midi|mp3|wav|m4a|flac)$/i, "") // Remove common audio file extensions
+        .replace(/\s+/g, " ") // Replace multiple spaces with single space
+        .trim(); // Remove leading/trailing spaces
+      const musicName = `${cleanTitle}.pdf`;
+      await generatePDF(containerRef, { filename: musicName });
+    } catch (error) {
+      console.error("Error exporting PDF:", error);
+    } finally {
+      setIsExporting(false);
+    }
   };
 
   return (
@@ -43,11 +60,18 @@ const MusicViewer = ({ selectedMxml }: MusicViewerProps) => {
         <Box sx={{ mb: 2, textAlign: "center" }}>
           <Button
             variant="contained"
-            startIcon={<PictureAsPdf />}
+            startIcon={
+              isExporting ? (
+                <CircularProgress size={20} color="inherit" />
+              ) : (
+                <PictureAsPdf />
+              )
+            }
             onClick={handleExportPdf}
+            disabled={isExporting}
             sx={{ minWidth: 150 }}
           >
-            Export PDF
+            {isExporting ? "Exporting..." : "Export PDF"}
           </Button>
         </Box>
       )}

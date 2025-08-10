@@ -27,7 +27,6 @@ const Home: React.FC = () => {
 
   return (
     <>
-      <Header />
       <Container maxWidth="sm" sx={{ mb: 2 }}>
         <Box sx={{ mt: 4, textAlign: "center" }}>
           <Typography variant="h4" component="h1" gutterBottom sx={{ mt: 4 }}>

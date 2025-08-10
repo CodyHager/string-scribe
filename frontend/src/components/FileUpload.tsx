@@ -1,6 +1,16 @@
 import React, { useState } from "react";
-import { Box, Button, Typography, Paper, LinearProgress } from "@mui/material";
+import {
+  Box,
+  Button,
+  Typography,
+  Paper,
+  LinearProgress,
+  FormControlLabel,
+  Checkbox,
+  Link,
+} from "@mui/material";
 import { CloudUpload } from "@mui/icons-material";
+import { Link as RouterLink } from "react-router-dom";
 
 interface FileUploadProps {
   onFileSelect?: (file: File) => void;
@@ -13,6 +23,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
 }) => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [dragActive, setDragActive] = useState(false);
+  const [agreedToTOS, setAgreedToTOS] = useState(false);
 
   const handleFileSelect = (file: File) => {
     if (file.type.startsWith("audio/")) {
@@ -82,11 +93,42 @@ const FileUpload: React.FC<FileUploadProps> = ({
         onChange={handleFileInput}
       />
 
-      <label htmlFor="audio-file-input">
-        <Button variant="contained" component="span" disabled={isLoading}>
-          Choose File
-        </Button>
-      </label>
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          gap: 2,
+        }}
+      >
+        <FormControlLabel
+          control={
+            <Checkbox
+              checked={agreedToTOS}
+              onChange={(e) => setAgreedToTOS(e.target.checked)}
+              color="primary"
+            />
+          }
+          label={
+            <Typography variant="body2" color="textSecondary">
+              I agree to the{" "}
+              <Link component={RouterLink} to="/terms">
+                Terms of Service
+              </Link>
+            </Typography>
+          }
+        />
+
+        <label htmlFor="audio-file-input">
+          <Button
+            variant="contained"
+            component="span"
+            disabled={isLoading || !agreedToTOS}
+          >
+            Choose File
+          </Button>
+        </label>
+      </Box>
 
       {isLoading && (
         <Box sx={{ mt: 2 }}>

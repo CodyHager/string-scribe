@@ -12,7 +12,6 @@ const Header: React.FC = () => {
           component={RouterLink}
           to="/"
           sx={{
-            flexGrow: 1,
             textDecoration: "none",
             color: "inherit",
             "&:hover": {
@@ -22,6 +21,23 @@ const Header: React.FC = () => {
         >
           <Typography variant="h6" component="div">
             String Scribe
+          </Typography>
+        </Link>
+
+        <Link
+          component={RouterLink}
+          to="/terms"
+          sx={{
+            textDecoration: "none",
+            ml: 2,
+            color: "inherit",
+            "&:hover": {
+              textDecoration: "none",
+            },
+          }}
+        >
+          <Typography variant="body1" component="div">
+            Terms
           </Typography>
         </Link>
       </Toolbar>
