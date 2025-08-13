@@ -1,20 +1,24 @@
 import React, { useState } from "react";
 import { Container, Typography, Box } from "@mui/material";
 import FileUpload from "../components/FileUpload";
-import Header from "../components/Header";
 import { UploadFile } from "../requests";
 import MusicViewer from "../components/MusicViewer";
 
 const Home: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [mxml, setMxml] = useState("");
-
+  // const [midi, setMidi] = useState<Uint8Array>(new Uint8Array()); 
+  const [midi, setMidi] = useState("");
+  
   const handleFileSelect = async (file: File) => {
     setIsLoading(true);
     UploadFile({ file: file })
       .then((resp) => {
         if (resp.data?.mxml) {
           setMxml(resp.data.mxml);
+        }
+        if (resp.data?.midi){
+          setMidi(resp.data.midi);
         }
       })
       .catch((error) => {
@@ -63,7 +67,7 @@ const Home: React.FC = () => {
       </Container>
 
       <Container maxWidth="lg">
-        <MusicViewer selectedMxml={mxml} />
+        <MusicViewer selectedMxml={mxml} selectedMidi={midi} />
       </Container>
     </Box>
   );

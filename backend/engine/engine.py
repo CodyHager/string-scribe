@@ -14,16 +14,19 @@ os.makedirs("processing", exist_ok=True)
 
 class MusicEngine:
 
-    async def Get_music_xml(file: UploadFile) -> str:
+    async def Get_music_xml(file: UploadFile) -> (str, bytes):
         try:
             ## step 1: audio to MIDI
             file_path = await create_file(file)
 
             midi_file_path = create_midi_file(file_path)
+            midi_bytes = bytes()
+            with open(midi_file_path, "rb") as midi_file:
+                midi_bytes = midi_file.read()
             ## step 2: MIDI to musicXML
             mxml_file_path = create_mxml_file(file, file_path, midi_file_path)
             mxml_string = read_file(mxml_file_path)
-            return mxml_string
+            return mxml_string, midi_bytes
         except:
             raise Exception("failed to generate sheet music")
         finally:

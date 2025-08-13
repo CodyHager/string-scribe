@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 import logger
 from engine.engine import MusicEngine
 import uvicorn
+import base64
 
 log = logger.get()
 
@@ -37,8 +38,9 @@ async def uploadFile(file: UploadFile):
     # Validate filename
     if not file.filename:
         raise HTTPException(status_code=400, detail="Invalid filename")
-    mxml = await MusicEngine.Get_music_xml(file)
-    return {"mxml": mxml}
+    mxml, midi = await MusicEngine.Get_music_xml(file)
+    midi_b64 = base64.b64encode(midi).decode('utf-8')
+    return {"mxml": mxml, "midi": midi_b64}
 
 
 if __name__ == "__main__":

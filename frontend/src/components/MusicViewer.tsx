@@ -5,19 +5,38 @@ import {
   CircularProgress,
   Typography,
 } from "@mui/material";
-import { PictureAsPdf } from "@mui/icons-material";
-import React, { useEffect, useState, useRef } from "react";
+import { PictureAsPdf, PlayArrow, StopCircle } from "@mui/icons-material";
+import { useEffect, useState, useRef, SetStateAction } from "react";
 import { OpenSheetMusicDisplay } from "opensheetmusicdisplay";
 import generatePDF from "react-to-pdf";
-
+import { Midi } from "@tonejs/midi";
+import * as Tone from "tone";
+import { DecodeBase64Data } from "../util";
 interface MusicViewerProps {
   selectedMxml: string;
+  //   selectedMidi: Uint8Array;
+  selectedMidi: string; //base64 string
 }
 
-const MusicViewer = ({ selectedMxml }: MusicViewerProps) => {
+const MusicViewer = ({ selectedMxml, selectedMidi }: MusicViewerProps) => {
+  const containerRef = useRef<HTMLDivElement>(null);
   const [osmd, setOsmd] = useState<OpenSheetMusicDisplay | null>(null);
   const [isExporting, setIsExporting] = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
+  const [isPlayingMidi, setIsPlayingMidi] = useState(false);
+    const [activeNotes, setActiveNotes] = useState<string[]>([]);
+
+  // Violin sampler using FluidR3 soundfont
+  const violinSampler = new Tone.Sampler({
+    urls: {
+      C4: "C4.mp3",
+      E4: "E4.mp3",
+      G4: "G4.mp3",
+      C5: "C5.mp3",
+    },
+    baseUrl:
+      "https://gleitz.github.io/midi-js-soundfonts/FluidR3_GM/violin-mp3/",
+    release: 1,
+  }).toDestination();
 
   useEffect(() => {
     if (containerRef.current) {
@@ -60,6 +79,48 @@ const MusicViewer = ({ selectedMxml }: MusicViewerProps) => {
     }
   };
 
+  const handlePlayMidi = async () => {
+    if (!isPlayingMidi) {
+      setIsPlayingMidi(true);
+
+      const midiBytes = DecodeBase64Data(selectedMidi);
+      const midi = new Midi(midiBytes);
+      const now = Tone.now() + 0.5;
+      let notes: string[] = [];
+      midi.tracks.forEach((track) => {
+        //create a synth for each track
+        // const synth = new Tone.PolySynth(Tone.Synth, {
+        //   envelope: {
+        //     attack: 0.02,
+        //     decay: 0.1,
+        //     sustain: 0.3,
+        //     release: 1,
+        //   },
+        // }).toDestination();
+        // synths.push(synth);
+        //schedule all of the events
+        track.notes.forEach((note) => {
+          violinSampler.triggerAttackRelease(
+            note.name,
+            note.duration,
+            note.time + now,
+            note.velocity
+          );
+          notes.push(note.name)
+        });
+    });
+    setActiveNotes(notes)
+    } else {
+      // stop playing
+      setIsPlayingMidi(false);
+      violinSampler.triggerRelease(activeNotes);
+      violinSampler.releaseAll(Tone.now())
+      violinSampler.disconnect();
+      violinSampler.dispose();
+      setActiveNotes([])
+    }
+  };
+
   return (
     <Container sx={{ width: "100%" }}>
       {selectedMxml !== "" && (
@@ -96,6 +157,29 @@ const MusicViewer = ({ selectedMxml }: MusicViewerProps) => {
             }}
           >
             {isExporting ? "Exporting..." : "Export PDF"}
+          </Button>
+          <Button
+            variant="contained"
+            startIcon={isPlayingMidi ? <StopCircle /> : <PlayArrow />}
+            onClick={handlePlayMidi}
+            sx={{
+              background:
+                "linear-gradient(135deg, #3429ff 0%,rgb(20, 0, 109) 100%)",
+              fontSize: "1.1rem",
+              px: 4,
+              py: 1.5,
+              borderRadius: 3,
+              ml: 4,
+              boxShadow: "0 4px 16px rgba(21, 0, 95, 0.99)",
+              "&:hover": {
+                background:
+                  "linear-gradient(135deg, #3429ff 0%,rgb(17, 2, 85) 100%)",
+                boxShadow: "0 4px 16px rgba(21, 0, 95, 0.47)",
+                transform: "translateY(-2px)",
+              },
+            }}
+          >
+            {!isPlayingMidi ? "Play Generated Music" : "Stop Generated Music"}
           </Button>
         </Box>
       )}

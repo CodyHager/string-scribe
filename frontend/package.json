@@ -15,6 +15,7 @@
     "@emotion/styled": "^11.11.0",
     "@mui/icons-material": "^5.14.19",
     "@mui/material": "^5.14.20",
+    "@tonejs/midi": "^2.0.28",
     "@types/node": "^16.18.68",
     "@types/react": "^18.2.42",
     "@types/react-dom": "^18.2.17",
@@ -25,6 +26,7 @@
     "react-router-dom": "^6.20.1",
     "react-scripts": "5.0.1",
     "react-to-pdf": "^2.0.1",
+    "tone": "^15.1.22",
     "typescript": "^4.9.5"
   },
   "devDependencies": {
