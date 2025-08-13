@@ -39,7 +39,7 @@ async def uploadFile(file: UploadFile):
     if not file.filename:
         raise HTTPException(status_code=400, detail="Invalid filename")
     mxml, midi = await MusicEngine.Get_music_xml(file)
-    midi_b64 = base64.b64encode(midi).decode('utf-8')
+    midi_b64 = base64.b64encode(midi).decode("utf-8")
     return {"mxml": mxml, "midi": midi_b64}
 
 

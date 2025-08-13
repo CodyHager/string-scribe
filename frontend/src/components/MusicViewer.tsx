@@ -23,7 +23,6 @@ const MusicViewer = ({ selectedMxml, selectedMidi }: MusicViewerProps) => {
   const [osmd, setOsmd] = useState<OpenSheetMusicDisplay | null>(null);
   const [isExporting, setIsExporting] = useState(false);
   const [isPlayingMidi, setIsPlayingMidi] = useState(false);
-    const [activeNotes, setActiveNotes] = useState<string[]>([]);
 
   // Violin sampler using FluidR3 soundfont
   const violinSampler = new Tone.Sampler({
@@ -80,13 +79,13 @@ const MusicViewer = ({ selectedMxml, selectedMidi }: MusicViewerProps) => {
   };
 
   const handlePlayMidi = async () => {
+    // TODO: handle when midi gets done playing
     if (!isPlayingMidi) {
       setIsPlayingMidi(true);
 
       const midiBytes = DecodeBase64Data(selectedMidi);
       const midi = new Midi(midiBytes);
       const now = Tone.now() + 0.5;
-      let notes: string[] = [];
       midi.tracks.forEach((track) => {
         //create a synth for each track
         // const synth = new Tone.PolySynth(Tone.Synth, {
@@ -100,24 +99,22 @@ const MusicViewer = ({ selectedMxml, selectedMidi }: MusicViewerProps) => {
         // synths.push(synth);
         //schedule all of the events
         track.notes.forEach((note) => {
-          violinSampler.triggerAttackRelease(
-            note.name,
-            note.duration,
-            note.time + now,
-            note.velocity
-          );
-          notes.push(note.name)
+          Tone.getTransport().schedule((time) => {
+            violinSampler.triggerAttackRelease(
+              note.name,
+              note.duration,
+              note.time + now,
+              note.velocity,
+            );
+          }, note.time);
         });
-    });
-    setActiveNotes(notes)
+      });
+      Tone.getTransport().start("+0.5");
     } else {
       // stop playing
       setIsPlayingMidi(false);
-      violinSampler.triggerRelease(activeNotes);
-      violinSampler.releaseAll(Tone.now())
-      violinSampler.disconnect();
-      violinSampler.dispose();
-      setActiveNotes([])
+      Tone.getTransport().stop();
+      Tone.getTransport().cancel();
     }
   };
 

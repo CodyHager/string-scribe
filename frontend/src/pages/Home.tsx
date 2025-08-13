@@ -7,9 +7,8 @@ import MusicViewer from "../components/MusicViewer";
 const Home: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [mxml, setMxml] = useState("");
-  // const [midi, setMidi] = useState<Uint8Array>(new Uint8Array()); 
   const [midi, setMidi] = useState("");
-  
+
   const handleFileSelect = async (file: File) => {
     setIsLoading(true);
     UploadFile({ file: file })
@@ -17,7 +16,7 @@ const Home: React.FC = () => {
         if (resp.data?.mxml) {
           setMxml(resp.data.mxml);
         }
-        if (resp.data?.midi){
+        if (resp.data?.midi) {
           setMidi(resp.data.midi);
         }
       })
