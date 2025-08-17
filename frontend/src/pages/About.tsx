@@ -6,6 +6,7 @@ import {
   List,
   ListItem,
   ListItemText,
+  Link,
 } from "@mui/material";
 
 const About: React.FC = () => {
@@ -198,6 +199,19 @@ const About: React.FC = () => {
         Whether you’re arranging your own compositions, learning a new piece, or
         simply experimenting with sound, String Scribe can help you create
         violin sheet music.
+      </Typography>
+      <Typography variant="h4" component="h2" gutterBottom sx={h4Style}>
+        Support
+      </Typography>
+      <Typography
+        variant="body1"
+        component="p"
+        gutterBottom
+        sx={{ lineHeight: 1.7, mb: 2 }}
+      >
+        You may reach out to{" "}
+        <Link href="mailto:stringscribe@gmail.com">stringscribe@gmail.com</Link>{" "}
+        for support or inquiries.
       </Typography>
     </Container>
   );

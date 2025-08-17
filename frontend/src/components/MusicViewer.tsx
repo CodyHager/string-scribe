@@ -6,7 +6,7 @@ import {
   Typography,
 } from "@mui/material";
 import { PictureAsPdf, PlayArrow, StopCircle } from "@mui/icons-material";
-import { useEffect, useState, useRef, SetStateAction } from "react";
+import { useEffect, useState, useRef } from "react";
 import { OpenSheetMusicDisplay } from "opensheetmusicdisplay";
 import generatePDF from "react-to-pdf";
 import { Midi } from "@tonejs/midi";
@@ -14,7 +14,6 @@ import * as Tone from "tone";
 import { DecodeBase64Data } from "../util";
 interface MusicViewerProps {
   selectedMxml: string;
-  //   selectedMidi: Uint8Array;
   selectedMidi: string; //base64 string
 }
 

@@ -9,6 +9,7 @@ import {
 } from "@mui/material";
 import { MusicNote } from "@mui/icons-material";
 import { Link as RouterLink } from "react-router-dom";
+import LoginButton from "./LoginButton";
 
 const Header: React.FC = () => {
   const headerLinkSX = {
@@ -87,6 +88,7 @@ const Header: React.FC = () => {
                 Terms
               </Typography>
             </Link>
+            <LoginButton />
           </Box>
         </Toolbar>
       </Container>
