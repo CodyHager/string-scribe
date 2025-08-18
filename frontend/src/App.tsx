@@ -6,6 +6,7 @@ import NotFound from "./pages/NotFound";
 import Terms from "./pages/Terms";
 import Header from "./components/Header";
 import About from "./pages/About";
+import Subscriptions from "./pages/Subscriptions";
 
 // Create a custom theme with modern, clean styling
 const theme = createTheme({
@@ -96,6 +97,7 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/about" element={<About />} />
             <Route path="/terms" element={<Terms />} />
+            <Route path="/subscriptions" element={<Subscriptions />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Box>

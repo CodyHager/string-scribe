@@ -7,15 +7,15 @@ const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement,
 );
 root.render(
-  <Auth0Provider
-    domain="dev-j4166eph5b4byvl0.us.auth0.com"
-    clientId="2gRGyulkFGmgAhDa1tZ4ri3DafRJXA7i"
-    authorizationParams={{
-      redirect_uri: window.location.origin,
-    }}
-  >
-    <React.StrictMode>
+  <React.StrictMode>
+    <Auth0Provider
+      domain="dev-j4166eph5b4byvl0.us.auth0.com"
+      clientId="2gRGyulkFGmgAhDa1tZ4ri3DafRJXA7i"
+      authorizationParams={{
+        redirect_uri: window.location.origin,
+      }}
+    >
       <App />
-    </React.StrictMode>
-  </Auth0Provider>,
+    </Auth0Provider>
+  </React.StrictMode>,
 );

@@ -88,6 +88,15 @@ const Header: React.FC = () => {
                 Terms
               </Typography>
             </Link>
+            <Link component={RouterLink} to="/subscriptions" sx={headerLinkSX}>
+              <Typography
+                variant="body1"
+                component="div"
+                sx={{ fontWeight: 500 }}
+              >
+                Subscriptions
+              </Typography>
+            </Link>
             <LoginButton />
           </Box>
         </Toolbar>
