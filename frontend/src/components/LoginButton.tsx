@@ -9,7 +9,7 @@ const LoginButton = () => {
   };
 
   return (
-    <Box sx={{ ml: "auto" }}>
+    <Box>
       {!isAuthenticated ? (
         <Button
           variant="contained"

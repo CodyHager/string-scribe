@@ -1,5 +1,5 @@
 import axios from "axios";
-import { FileUploadType } from "../types";
+import { FileUploadType, UserID } from "../types";
 import { BACKEND_BASE } from "../config";
 
 export const UploadFile = async (fileData: FileUploadType) => {

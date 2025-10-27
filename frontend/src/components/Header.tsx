@@ -97,7 +97,9 @@ const Header: React.FC = () => {
                 Subscriptions
               </Typography>
             </Link>
-            <LoginButton />
+            <Box sx={{ ml: "auto" }}>
+              <LoginButton />
+            </Box>
           </Box>
         </Toolbar>
       </Container>

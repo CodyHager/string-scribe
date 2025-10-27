@@ -1,12 +1,15 @@
 import json
+from model import UserID
 from fastapi import FastAPI, UploadFile, HTTPException, Request
-from fastapi.responses import RedirectResponse, Response
+from fastapi.responses import JSONResponse, RedirectResponse, Response
 from fastapi.middleware.cors import CORSMiddleware
 import logger
 from engine.engine import MusicEngine
 import uvicorn
 import base64, os
 import stripe
+from fastapi import Form
+import client.client as client
 
 log = logger.get()
 
@@ -37,8 +40,13 @@ if frontend_host is None:
     log.fatal("frontend host env not found. exiting...")
 
 
+@app.on_event("startup")
+async def startup_event():
+    client.init_client()
+
+
 @app.post("/create-checkout-session")
-async def createCheckoutSession():
+async def createCheckoutSession(id: str = Form(...)):
     try:
         checkout_session = stripe.checkout.Session.create(
             line_items=[
@@ -50,6 +58,10 @@ async def createCheckoutSession():
             mode="subscription",
             success_url=frontend_host + "/subscriptions?success=true",
             cancel_url=frontend_host + "/subscriptions?success=false",
+            client_reference_id=id,
+            subscription_data={
+                "metadata": {"user_id": id},
+            },
         )
     except Exception as e:
         log.error(f"error when creating stripe checkout session: {e}")
@@ -63,12 +75,12 @@ async def createCheckoutSession():
 @app.post("/api/v1/process-subscription")
 async def processSubscription(request: Request):
     log.info("received webhook for subscription")
-    payload = request.data
+    payload = await request.body()
     try:
         event = json.loads(payload)
     except json.decoder.JSONDecodeError as e:
         log.error("⚠️  Webhook error while parsing basic request." + str(e))
-        return {"success": False}
+        return JSONResponse({"success": False}, 400)
     if webhook_sk:
         # Only verify the event if there is an endpoint secret defined
         # Otherwise use the basic event deserialized with json
@@ -77,17 +89,24 @@ async def processSubscription(request: Request):
             event = stripe.Webhook.construct_event(payload, sig_header, webhook_sk)
         except stripe.error.SignatureVerificationError as e:
             log.error("⚠️  Webhook signature verification failed." + str(e))
-            return {"success": False}
-
+            return JSONResponse({"success": False}, 400)
     # Handle the event
-    if event and event["type"] == "payment_intent.succeeded":
-        payment_intent = event["data"]["object"]  # contains a stripe.PaymentIntent
-        log.info("Payment for {} succeeded".format(payment_intent["amount"]))
-        ## TODO: finish this later
+    if event and event["type"] == "invoice.payment_succeeded":
+        invoice = event["data"]["object"]
+        log.info(f"Payment for {invoice['amount_paid']} succeeded")
+        user_id = invoice["parent"]["subscription_details"]["metadata"]["user_id"]
+        if not user_id or user_id == "":
+            log.error("empty user ID")
+            return JSONResponse({"success": False}, 400)
+        log.info(f"USER ID: {user_id}")
+        try:
+            client.Update_app_meta(user_id)
+        except:
+            return JSONResponse({"success": False}, 500)
     else:
         # Unexpected event type
-        log.error("Unhandled event type {}".format(event["type"]))
-    return {"success": True}
+        log.warning("Unhandled event type {}".format(event["type"]))
+    return JSONResponse({"success": True}, 200)
 
 
 @app.post("/api/v1/upload")
