@@ -100,7 +100,7 @@ async def processSubscription(request: Request):
             return JSONResponse({"success": False}, 400)
         log.info(f"USER ID: {user_id}")
         try:
-            client.Update_app_meta(user_id)
+            client.Add_Pro_Role(user_id)
         except:
             return JSONResponse({"success": False}, 500)
     else:

@@ -11,6 +11,7 @@ TOKEN_EXPIRY = 0
 AUTH0_BASE = ""
 AUTH0_CLIENT_ID = ""
 AUTH0_CLIENT_SECRET = ""
+PRO_ROLE_ID = "rol_pU2GNtsAS3lwDU7A"
 
 
 def init_client():
@@ -48,6 +49,33 @@ def Update_app_meta(user_id: str):
             raise ValueError(f"unexpected response from Auth0: {response.json()}")
     except Exception as err:
         log.error(f"Error while trying to update metadata for user: {err}")
+        raise err
+
+
+def Add_Pro_Role(user_id: str):
+    global CURRENT_TOKEN, TOKEN_EXPIRY, AUTH0_BASE, AUTH0_CLIENT_ID, AUTH0_CLIENT_SECRET
+    try:
+        payload = {"roles": [PRO_ROLE_ID]}
+        url = f"{AUTH0_BASE}/api/v2/users/{user_id}/roles"
+        token = get_token()
+        headers = {
+            "Authorization": f"Bearer {token}",
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+        }
+        response = requests.post(url, json=payload, headers=headers)
+        # Auth0 returns 204 No Content on success for role assignment
+        if response.status_code not in (200, 204):
+            error_msg = response.text
+            try:
+                error_json = response.json()
+                error_msg = str(error_json)
+            except:
+                pass
+            log.error(f"unexpected response from Auth0 (status {response.status_code}): {error_msg}")
+            raise ValueError(f"unexpected response from Auth0 (status {response.status_code}): {error_msg}")
+    except Exception as err:
+        log.error(f"Error while trying to add role to user: {err}")
         raise err
 
 
