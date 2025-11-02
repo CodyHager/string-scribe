@@ -52,7 +52,7 @@ const Subscriptions: React.FC = () => {
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
-              width: "30%",
+              minWidth: "30%",
               p: 3,
             }}
           >
@@ -84,6 +84,9 @@ const Subscriptions: React.FC = () => {
                 Icon={<CancelIcon color="error" />}
               />
             </Box>
+            <Typography variant="h4" gutterBottom>
+              Monthly Cost: Free
+            </Typography>
             <Button type="submit" variant="contained" disabled>
               Free plan activated
             </Button>
@@ -94,7 +97,7 @@ const Subscriptions: React.FC = () => {
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
-              width: "30%",
+              minWidth: "30%",
               p: 3,
             }}
           >
@@ -126,6 +129,9 @@ const Subscriptions: React.FC = () => {
                 Icon={<CheckCircleIcon color="success" />}
               ></SubListItem>
             </Box>
+            <Typography variant="h4" gutterBottom>
+              Monthly Cost: $5.99
+            </Typography>
             <form
               action={`${BACKEND_BASE}/create-checkout-session`}
               method="POST"

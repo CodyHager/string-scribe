@@ -11,11 +11,11 @@ TOKEN_EXPIRY = 0
 AUTH0_BASE = ""
 AUTH0_CLIENT_ID = ""
 AUTH0_CLIENT_SECRET = ""
-PRO_ROLE_ID = "rol_pU2GNtsAS3lwDU7A"
+AUTH0_PRO_ROLE_ID = ""
 
 
 def init_client():
-    global CURRENT_TOKEN, TOKEN_EXPIRY, AUTH0_BASE, AUTH0_CLIENT_ID, AUTH0_CLIENT_SECRET
+    global CURRENT_TOKEN, TOKEN_EXPIRY, AUTH0_BASE, AUTH0_CLIENT_ID, AUTH0_CLIENT_SECRET, AUTH0_PRO_ROLE_ID
     AUTH0_BASE = os.getenv("AUTH0_BASE")
     if AUTH0_BASE is None or AUTH0_BASE == "":
         log.fatal("AUTH0 base env var not found. exiting...")
@@ -27,12 +27,16 @@ def init_client():
     AUTH0_CLIENT_SECRET = os.getenv("AUTH0_CLIENT_SECRET")
     if AUTH0_CLIENT_SECRET is None or AUTH0_CLIENT_SECRET == "":
         log.fatal("Auth0 client secret env var not found. exiting...")
+
+    AUTH0_PRO_ROLE_ID = os.getenv("AUTH0_PRO_ROLE_ID")
+    if AUTH0_PRO_ROLE_ID is None or AUTH0_PRO_ROLE_ID == "":
+        log.fatal("Auth0 role id env var not found. exiting...")
     CURRENT_TOKEN = None
     TOKEN_EXPIRY = 0
 
 
 def Update_app_meta(user_id: str):
-    global CURRENT_TOKEN, TOKEN_EXPIRY, AUTH0_BASE, AUTH0_CLIENT_ID, AUTH0_CLIENT_SECRET
+    global CURRENT_TOKEN, TOKEN_EXPIRY, AUTH0_BASE, AUTH0_CLIENT_ID, AUTH0_CLIENT_SECRET, AUTH0_PRO_ROLE_ID
     try:
         t = datetime.now().isoformat()
         payload = {"app_metadata": {"last_invoice": t}}
@@ -53,9 +57,9 @@ def Update_app_meta(user_id: str):
 
 
 def Add_Pro_Role(user_id: str):
-    global CURRENT_TOKEN, TOKEN_EXPIRY, AUTH0_BASE, AUTH0_CLIENT_ID, AUTH0_CLIENT_SECRET
+    global CURRENT_TOKEN, TOKEN_EXPIRY, AUTH0_BASE, AUTH0_CLIENT_ID, AUTH0_CLIENT_SECRET, AUTH0_PRO_ROLE_ID
     try:
-        payload = {"roles": [PRO_ROLE_ID]}
+        payload = {"roles": [AUTH0_PRO_ROLE_ID]}
         url = f"{AUTH0_BASE}/api/v2/users/{user_id}/roles"
         token = get_token()
         headers = {
@@ -72,8 +76,12 @@ def Add_Pro_Role(user_id: str):
                 error_msg = str(error_json)
             except:
                 pass
-            log.error(f"unexpected response from Auth0 (status {response.status_code}): {error_msg}")
-            raise ValueError(f"unexpected response from Auth0 (status {response.status_code}): {error_msg}")
+            log.error(
+                f"unexpected response from Auth0 (status {response.status_code}): {error_msg}"
+            )
+            raise ValueError(
+                f"unexpected response from Auth0 (status {response.status_code}): {error_msg}"
+            )
     except Exception as err:
         log.error(f"Error while trying to add role to user: {err}")
         raise err
