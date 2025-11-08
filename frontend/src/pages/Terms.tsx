@@ -9,8 +9,9 @@ import {
   ListItemText,
 } from "@mui/material";
 
+// simple page displaying TOS
+
 const Terms: React.FC = () => {
-  // TODO: make this extendable instead of copy/paste
   const h4Style = {
     color: "#667eea",
     fontWeight: 600,

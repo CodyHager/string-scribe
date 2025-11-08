@@ -1,6 +1,8 @@
 import React from "react";
 import { Box, Typography } from "@mui/material";
 
+// Simple component for the list items on the subscription cards
+
 interface SubListItemProps {
   itemText: string;
   Icon?: React.ReactNode;

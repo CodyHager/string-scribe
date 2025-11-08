@@ -9,7 +9,7 @@ import About from "./pages/About";
 import Subscriptions from "./pages/Subscriptions";
 import AccountDrawer from "./components/AccountDrawer";
 
-// Create a custom theme with modern, clean styling
+// custom MUI theme
 const theme = createTheme({
   palette: {
     primary: {
@@ -99,6 +99,7 @@ function App() {
             <Route path="/about" element={<About />} />
             <Route path="/terms" element={<Terms />} />
             <Route path="/subscriptions" element={<Subscriptions />} />
+            {/* if no path has been matched yet, it will land on the 404 page */}
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Box>

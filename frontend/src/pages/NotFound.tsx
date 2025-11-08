@@ -25,12 +25,11 @@ const NotFound: React.FC = () => {
           sx={{
             fontSize: "8rem",
             fontWeight: 700,
-            background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+            background: "#764ba2",
             backgroundClip: "text",
             WebkitBackgroundClip: "text",
             WebkitTextFillColor: "transparent",
             mb: 2,
-            filter: "drop-shadow(0 4px 8px rgba(102, 126, 234, 0.2))",
           }}
         >
           404
@@ -63,15 +62,14 @@ const NotFound: React.FC = () => {
           onClick={() => navigate("/")}
           size="large"
           sx={{
-            background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+            background: "#764ba2",
             fontSize: "1.1rem",
             px: 4,
             py: 1.5,
             borderRadius: 3,
-            boxShadow: "0 4px 16px rgba(102, 126, 234, 0.3)",
+            boxShadow: "0 4px 16px #764ba2",
             "&:hover": {
-              background: "linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%)",
-              boxShadow: "0 6px 24px rgba(102, 126, 234, 0.4)",
+              background: "#764ba2",
               transform: "translateY(-2px)",
             },
           }}

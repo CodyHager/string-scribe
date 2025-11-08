@@ -18,8 +18,10 @@ const LoginButton = () => {
       // do nothing
       return;
     } else if (isAuthenticated) {
+      // log out
       logout({ logoutParams: { returnTo: window.location.origin } });
     } else {
+      // log in
       loginWithRedirect();
     }
   };

@@ -10,9 +10,12 @@ const Home: React.FC = () => {
   const [midi, setMidi] = useState("");
 
   const handleFileSelect = async (file: File) => {
+    // update loading state
     setIsLoading(true);
+    // send file to backend for processing
     UploadFile({ file: file })
       .then((resp) => {
+        // set MXML and MIDI states
         if (resp.data?.mxml) {
           setMxml(resp.data.mxml);
         }
@@ -24,6 +27,7 @@ const Home: React.FC = () => {
         console.error(error);
       })
       .finally(() => {
+        // remove loading state
         setIsLoading(false);
       });
   };
@@ -54,7 +58,8 @@ const Home: React.FC = () => {
               mb: 4,
               fontWeight: 400,
               maxWidth: 600,
-              mx: "auto",
+              ml: "auto",
+              mr: "auto",
               lineHeight: 1.6,
             }}
           >
@@ -64,7 +69,6 @@ const Home: React.FC = () => {
           <FileUpload onFileSelect={handleFileSelect} isLoading={isLoading} />
         </Box>
       </Container>
-
       <Container maxWidth="lg">
         <MusicViewer selectedMxml={mxml} selectedMidi={midi} />
       </Container>

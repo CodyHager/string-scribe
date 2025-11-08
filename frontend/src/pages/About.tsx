@@ -9,6 +9,8 @@ import {
   Link,
 } from "@mui/material";
 
+// simple page describing the purpose of String scribe
+
 const About: React.FC = () => {
   const h4Style = {
     color: "#667eea",
@@ -112,8 +114,8 @@ const About: React.FC = () => {
         Ever wanted to learn to play a song on the violin, but you can't find
         the score or a tutorial anywhere? This is a very disappointing feeling.
         The only way to learn the song is to learn it by ear, which is time
-        consuming (although also a good exercise). String Scribe is meant to aid
-        violin players in this position,{" "}
+        consuming. String Scribe is meant to aid violin players in this
+        position,{" "}
         <Box component="span" fontWeight="fontWeightBold">
           not replacing the process of learning a song through hearing,{" "}
         </Box>

@@ -11,6 +11,7 @@ export const DecodeBase64Data = (base64String: string): Uint8Array => {
   return actualBytes;
 };
 
+// given an Auth0 user, returns whether or not they have a pro subscription
 export const IsPro = (user: User): boolean => {
   const roles: string[] = user?.[`${AUTH0_CLAIM_NS}/roles`];
   return roles?.includes("pro");

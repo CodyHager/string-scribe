@@ -25,6 +25,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
   const [dragActive, setDragActive] = useState(false);
   const [agreedToTOS, setAgreedToTOS] = useState(false);
 
+  // validation before selecting file
   const handleFileSelect = (file: File) => {
     if (!file.type.startsWith("audio/")) {
       alert("Please select an audio file");
@@ -36,6 +37,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
     }
   };
 
+  // drag/drop handlers
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     setDragActive(false);
@@ -56,6 +58,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
     setDragActive(false);
   };
 
+  // direct file input
   const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (files && files.length > 0) {
@@ -94,7 +97,6 @@ const FileUpload: React.FC<FileUploadProps> = ({
             : "none",
         }}
       />
-
       <Typography
         variant="h5"
         gutterBottom
@@ -106,7 +108,6 @@ const FileUpload: React.FC<FileUploadProps> = ({
       >
         Upload Audio File
       </Typography>
-
       <Typography
         variant="body1"
         color="text.secondary"
@@ -119,7 +120,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
       >
         Drag and drop an audio file here, or click to browse.
       </Typography>
-
+      {/* Disable input if loading or the user hasn't agreed to the TOS */}
       <input
         accept="audio/*"
         style={{ display: "none" }}
@@ -128,7 +129,6 @@ const FileUpload: React.FC<FileUploadProps> = ({
         onChange={handleFileInput}
         disabled={isLoading || !agreedToTOS}
       />
-
       <Box
         sx={{
           display: "flex",
@@ -137,6 +137,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
           gap: 2,
         }}
       >
+        {/* TOS form */}
         <FormControlLabel
           control={
             <Checkbox
@@ -174,7 +175,6 @@ const FileUpload: React.FC<FileUploadProps> = ({
           }
           sx={{ mb: 3 }}
         />
-
         <label htmlFor="audio-file-input">
           <Button
             variant="contained"
@@ -204,7 +204,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
           </Button>
         </label>
       </Box>
-
+      {/* Loading state */}
       {isLoading && (
         <Box
           sx={{
@@ -238,7 +238,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
           </Typography>
         </Box>
       )}
-
+      {/* File uploaded state */}
       {selectedFile && !isLoading && (
         <Box
           sx={{

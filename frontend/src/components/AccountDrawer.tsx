@@ -11,6 +11,8 @@ import { IsPro } from "../util";
 import { useNavigate } from "react-router-dom";
 import { STRIPE_CUSTOMER_PORTAL } from "../config";
 
+// AccountDrawer.tsx is the pop out when clicking the profile icon
+
 interface AccountDrawerProps {
   isOpen: boolean;
   setOpen: (open: boolean) => void;
@@ -27,6 +29,7 @@ const AccountDrawer: React.FC<AccountDrawerProps> = ({ isOpen, setOpen }) => {
     setOpen(false);
   };
 
+  // redirects to stripe customer portal
   const handleClickManageSubscription = () => {
     if (!STRIPE_CUSTOMER_PORTAL) {
       console.error("stripe customer portal not defined");
@@ -43,12 +46,13 @@ const AccountDrawer: React.FC<AccountDrawerProps> = ({ isOpen, setOpen }) => {
       anchor="right"
       PaperProps={{
         sx: {
-          width: 420,
+          width: 480,
           padding: 3,
         },
       }}
     >
       <Box sx={{ padding: 2 }}>
+        {/* loading state */}
         {isLoading ? (
           <CircularProgress />
         ) : (
@@ -57,17 +61,20 @@ const AccountDrawer: React.FC<AccountDrawerProps> = ({ isOpen, setOpen }) => {
               Account Information
             </Typography>
             <Divider />
+            {/* Unauthenticated state */}
             {!isAuthenticated || !user ? (
               <Typography variant="body1">
                 Log in to view your account.
               </Typography>
             ) : (
+              // Authenticated state
               <>
                 <Typography variant="h6">Name: {user?.name}</Typography>
                 <Typography variant="h6">Email: {user?.email}</Typography>
                 <Box
                   sx={{ display: "flex", alignItems: "center", gap: 2, mt: 2 }}
                 >
+                  {/* Display different options based on whether the user is subscribed or not */}
                   <Typography variant="h6">
                     Subscription: {!IsPro(user) ? "Free Plan" : "Pro Plan"}
                   </Typography>

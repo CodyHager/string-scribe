@@ -49,6 +49,7 @@ const Header: React.FC = () => {
         <Container maxWidth="lg">
           <Toolbar sx={{ px: { xs: 0 } }}>
             <Box sx={{ display: "flex", alignItems: "center", flexGrow: 1 }}>
+              {/* Left side */}
               <MusicNote
                 sx={{
                   mr: 2,
@@ -113,6 +114,7 @@ const Header: React.FC = () => {
                   Subscriptions
                 </Typography>
               </Link>
+              {/* Right side  */}
               <Box sx={{ display: "flex", ml: "auto", alignItems: "center" }}>
                 <LoginButton />
                 <IconButton onClick={handleClickAccount}>

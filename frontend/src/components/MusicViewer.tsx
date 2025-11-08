@@ -12,6 +12,7 @@ import generatePDF from "react-to-pdf";
 import { Midi } from "@tonejs/midi";
 import * as Tone from "tone";
 import { DecodeBase64Data } from "../util";
+
 interface MusicViewerProps {
   selectedMxml: string;
   selectedMidi: string; //base64 string
@@ -36,6 +37,7 @@ const MusicViewer = ({ selectedMxml, selectedMidi }: MusicViewerProps) => {
     release: 1,
   }).toDestination();
 
+  // keep state and ref in sync
   useEffect(() => {
     if (containerRef.current) {
       const o = new OpenSheetMusicDisplay(containerRef.current);
@@ -43,6 +45,7 @@ const MusicViewer = ({ selectedMxml, selectedMidi }: MusicViewerProps) => {
     }
   }, []);
 
+  // render music whenever the selectedMxml changes
   useEffect(() => {
     if (osmd && selectedMxml && selectedMxml !== "") {
       const renderMusic = async () => {
@@ -64,9 +67,7 @@ const MusicViewer = ({ selectedMxml, selectedMidi }: MusicViewerProps) => {
         osmd?.GraphicSheet.Title.toString() || "string-scribe-export";
       // Clean the filename by removing parentheses and their contents, extra spaces, and file extensions
       const cleanTitle = rawTitle
-        .replace(/\([^)]*\)/g, "") // Remove anything in parentheses
-        .replace(/\.(mid|midi|mp3|wav|m4a|flac)$/i, "") // Remove common audio file extensions
-        .replace(/\s+/g, " ") // Replace multiple spaces with single space
+        .replace("  ", " ") // remove multiple spaces
         .trim(); // Remove leading/trailing spaces
       const musicName = `${cleanTitle}.pdf`;
       await generatePDF(containerRef, { filename: musicName });
@@ -81,22 +82,11 @@ const MusicViewer = ({ selectedMxml, selectedMidi }: MusicViewerProps) => {
     // TODO: handle when midi gets done playing
     if (!isPlayingMidi) {
       setIsPlayingMidi(true);
-
       const midiBytes = DecodeBase64Data(selectedMidi);
       const midi = new Midi(midiBytes);
       const now = Tone.now() + 0.5;
       midi.tracks.forEach((track) => {
-        //create a synth for each track
-        // const synth = new Tone.PolySynth(Tone.Synth, {
-        //   envelope: {
-        //     attack: 0.02,
-        //     decay: 0.1,
-        //     sustain: 0.3,
-        //     release: 1,
-        //   },
-        // }).toDestination();
-        // synths.push(synth);
-        //schedule all of the events
+        // schedule all of the events
         track.notes.forEach((note) => {
           Tone.getTransport().schedule((time) => {
             violinSampler.triggerAttackRelease(
@@ -119,6 +109,7 @@ const MusicViewer = ({ selectedMxml, selectedMidi }: MusicViewerProps) => {
 
   return (
     <Container sx={{ width: "100%" }}>
+      {/* export and play buttons */}
       {selectedMxml !== "" && (
         <Box sx={{ mb: 4, textAlign: "center" }}>
           <Button
@@ -133,22 +124,15 @@ const MusicViewer = ({ selectedMxml, selectedMidi }: MusicViewerProps) => {
             onClick={handleExportPdf}
             disabled={isExporting}
             sx={{
-              background: "linear-gradient(135deg, #f50057 0%, #c51162 100%)",
+              background: "#c7265e",
               fontSize: "1.1rem",
               px: 4,
               py: 1.5,
               borderRadius: 3,
               boxShadow: "0 4px 16px rgba(245, 0, 87, 0.3)",
               "&:hover": {
-                background: "linear-gradient(135deg, #e6004c 0%, #b30d56 100%)",
-                boxShadow: "0 6px 24px rgba(245, 0, 87, 0.4)",
                 transform: "translateY(-2px)",
-              },
-              "&:disabled": {
-                background: "#e0e0e0",
-                color: "#9e9e9e",
-                boxShadow: "none",
-                transform: "none",
+                background: "#c7265e",
               },
             }}
           >
@@ -159,8 +143,7 @@ const MusicViewer = ({ selectedMxml, selectedMidi }: MusicViewerProps) => {
             startIcon={isPlayingMidi ? <StopCircle /> : <PlayArrow />}
             onClick={handlePlayMidi}
             sx={{
-              background:
-                "linear-gradient(135deg, #3429ff 0%,rgb(20, 0, 109) 100%)",
+              background: "#3429ff",
               fontSize: "1.1rem",
               px: 4,
               py: 1.5,
@@ -168,9 +151,7 @@ const MusicViewer = ({ selectedMxml, selectedMidi }: MusicViewerProps) => {
               ml: 4,
               boxShadow: "0 4px 16px rgba(21, 0, 95, 0.99)",
               "&:hover": {
-                background:
-                  "linear-gradient(135deg, #3429ff 0%,rgb(17, 2, 85) 100%)",
-                boxShadow: "0 4px 16px rgba(21, 0, 95, 0.47)",
+                background: "#3429ff",
                 transform: "translateY(-2px)",
               },
             }}
@@ -179,14 +160,14 @@ const MusicViewer = ({ selectedMxml, selectedMidi }: MusicViewerProps) => {
           </Button>
         </Box>
       )}
-
+      {/* Sheet music container  */}
       <Box
         ref={containerRef}
         sx={{
           width: "100%",
           minHeight: "500px",
           border:
-            selectedMxml !== "" ? "2px solid rgba(102, 126, 234, 0.2)" : "none",
+            selectedMxml !== "" ? "2px solid rgba(102, 126, 234, 0.2)" : "",
           backgroundColor: selectedMxml !== "" ? "white" : "transparent",
           boxShadow:
             selectedMxml !== "" ? "0 4px 20px rgba(0, 0, 0, 0.08)" : "none",

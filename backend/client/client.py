@@ -1,67 +1,43 @@
-import requests, os, time
-import logger
-from model import AppMetadata
+import logger, requests, os, time
+from util import MustGetEnv
 from datetime import datetime
-from urllib.parse import urljoin
+
+## client.py is used to interact with the Auth0 management api
+## namely, to add and remove user roles
 
 log = logger.get()
 
+AUTH0_BASE_ENV = "AUTH0_BASE"
+AUTH0_CLIENT_ID_ENV = "AUTH0_CLIENT_ID"
+AUTH0_CLIENT_SECRET_ENV = "AUTH0_CLIENT_SECRET"
+AUTH0_ROLE_ID_ENV = "AUTH0_PRO_ROLE_ID"
+
+## cache token so we don't need to get a new one on every request
 CURRENT_TOKEN = None
 TOKEN_EXPIRY = 0
+## env vars
 AUTH0_BASE = ""
 AUTH0_CLIENT_ID = ""
 AUTH0_CLIENT_SECRET = ""
 AUTH0_PRO_ROLE_ID = ""
 
 
-def init_client():
-    global CURRENT_TOKEN, TOKEN_EXPIRY, AUTH0_BASE, AUTH0_CLIENT_ID, AUTH0_CLIENT_SECRET, AUTH0_PRO_ROLE_ID
-    AUTH0_BASE = os.getenv("AUTH0_BASE")
-    if AUTH0_BASE is None or AUTH0_BASE == "":
-        log.fatal("AUTH0 base env var not found. exiting...")
-
-    AUTH0_CLIENT_ID = os.getenv("AUTH0_CLIENT_ID")
-    if AUTH0_CLIENT_ID is None or AUTH0_CLIENT_ID == "":
-        log.fatal("Auth0 client ID env var not found. exiting...")
-
-    AUTH0_CLIENT_SECRET = os.getenv("AUTH0_CLIENT_SECRET")
-    if AUTH0_CLIENT_SECRET is None or AUTH0_CLIENT_SECRET == "":
-        log.fatal("Auth0 client secret env var not found. exiting...")
-
-    AUTH0_PRO_ROLE_ID = os.getenv("AUTH0_PRO_ROLE_ID")
-    if AUTH0_PRO_ROLE_ID is None or AUTH0_PRO_ROLE_ID == "":
-        log.fatal("Auth0 role id env var not found. exiting...")
-    CURRENT_TOKEN = None
-    TOKEN_EXPIRY = 0
+def InitClient():
+    global AUTH0_BASE, AUTH0_CLIENT_ID, AUTH0_CLIENT_SECRET, AUTH0_PRO_ROLE_ID
+    AUTH0_BASE = MustGetEnv(AUTH0_BASE_ENV)
+    AUTH0_CLIENT_ID = MustGetEnv(AUTH0_CLIENT_ID_ENV)
+    AUTH0_CLIENT_SECRET = MustGetEnv(AUTH0_CLIENT_SECRET_ENV)
+    AUTH0_PRO_ROLE_ID = MustGetEnv(AUTH0_ROLE_ID_ENV)
 
 
-def Update_app_meta(user_id: str):
-    global CURRENT_TOKEN, TOKEN_EXPIRY, AUTH0_BASE, AUTH0_CLIENT_ID, AUTH0_CLIENT_SECRET, AUTH0_PRO_ROLE_ID
+## https://auth0.com/docs/api/management/v2/users/post-user-roles
+def AddProRole(user_id: str):
     try:
-        t = datetime.now().isoformat()
-        payload = {"app_metadata": {"last_invoice": t}}
-        url = f"{AUTH0_BASE}/api/v2/users/{user_id}"
-        token = get_token()
-        headers = {
-            "Authorization": f"Bearer {token}",
-            "Content-Type": "application/json",
-            "Accept": "application/json",
-        }
-        response = requests.patch(url, json=payload, headers=headers)
-        if response.status_code != 200:
-            log.error(f"unexpected response from Auth0: {response.json()}")
-            raise ValueError(f"unexpected response from Auth0: {response.json()}")
-    except Exception as err:
-        log.error(f"Error while trying to update metadata for user: {err}")
-        raise err
-
-
-def Add_Pro_Role(user_id: str):
-    global CURRENT_TOKEN, TOKEN_EXPIRY, AUTH0_BASE, AUTH0_CLIENT_ID, AUTH0_CLIENT_SECRET, AUTH0_PRO_ROLE_ID
-    try:
+        ## payload is what roles we want to add
         payload = {"roles": [AUTH0_PRO_ROLE_ID]}
         url = f"{AUTH0_BASE}/api/v2/users/{user_id}/roles"
-        token = get_token()
+        ## get auth token and add it to header
+        token = getToken()
         headers = {
             "Authorization": f"Bearer {token}",
             "Content-Type": "application/json",
@@ -70,12 +46,8 @@ def Add_Pro_Role(user_id: str):
         response = requests.post(url, json=payload, headers=headers)
         # Auth0 returns 204 No Content on success for role assignment
         if response.status_code > 299:
+            ## log and throw error
             error_msg = response.text
-            try:
-                error_json = response.json()
-                error_msg = str(error_json)
-            except:
-                pass
             log.error(
                 f"unexpected response from Auth0 (status {response.status_code}): {error_msg}"
             )
@@ -87,11 +59,13 @@ def Add_Pro_Role(user_id: str):
         raise err
 
 
-def Remove_Pro_Role(user_id: str):
+## https://auth0.com/docs/api/management/v2/users/delete-user-roles
+## basically same thing as AddProRole, just change request method to DELETE
+def RemoveProRole(user_id: str):
     try:
         payload = {"roles": [AUTH0_PRO_ROLE_ID]}
         url = f"{AUTH0_BASE}/api/v2/users/{user_id}/roles"
-        token = get_token()
+        token = getToken()
         headers = {
             "Authorization": f"Bearer {token}",
             "Content-Type": "application/json",
@@ -101,11 +75,6 @@ def Remove_Pro_Role(user_id: str):
         # Auth0 returns 204 No Content on success for role deletion
         if response.status_code > 299:
             error_msg = response.text
-            try:
-                error_json = response.json()
-                error_msg = str(error_json)
-            except:
-                pass
             log.error(
                 f"unexpected response from Auth0 (status {response.status_code}): {error_msg}"
             )
@@ -117,11 +86,11 @@ def Remove_Pro_Role(user_id: str):
         raise err
 
 
-def get_token() -> str:
+## fetches a new token from Auth0 if the cached one is expired
+def getToken() -> str:
     global CURRENT_TOKEN, TOKEN_EXPIRY, AUTH0_BASE, AUTH0_CLIENT_ID, AUTH0_CLIENT_SECRET
     if CURRENT_TOKEN and time.time() < TOKEN_EXPIRY:
         return CURRENT_TOKEN
-    print(f"BASE: {AUTH0_BASE}")
     url = f"{AUTH0_BASE}/oauth/token"
     payload = {
         "client_id": AUTH0_CLIENT_ID,
@@ -129,9 +98,11 @@ def get_token() -> str:
         "audience": f"{AUTH0_BASE}/api/v2/",
         "grant_type": "client_credentials",
     }
+    ## make request to Auth0
     response = requests.post(url, json=payload)
     response.raise_for_status()
     data = response.json()
+    ## extract token from response
     CURRENT_TOKEN = data["access_token"]
     ## default to 24hr
     expires_in = data.get("expires_in", 86400)
