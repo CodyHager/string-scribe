@@ -7,3 +7,6 @@ export const AUTH0_CLAIM_NS =
 export const AUTH0_DOMAIN = process.env.REACT_APP_AUTH0_DOMAIN;
 
 export const AUTH0_CLIENT_ID = process.env.REACT_APP_AUTH0_CLIENT_ID;
+
+export const STRIPE_CUSTOMER_PORTAL =
+  process.env.REACT_APP_STRIPE_CUSTOMER_PORTAL;

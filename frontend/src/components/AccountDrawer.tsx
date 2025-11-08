@@ -8,7 +8,8 @@ import {
   Button,
 } from "@mui/material";
 import { IsPro } from "../util";
-import { Navigate, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { STRIPE_CUSTOMER_PORTAL } from "../config";
 
 interface AccountDrawerProps {
   isOpen: boolean;
@@ -24,6 +25,15 @@ const AccountDrawer: React.FC<AccountDrawerProps> = ({ isOpen, setOpen }) => {
     navigate("/subscriptions");
     // close panel
     setOpen(false);
+  };
+
+  const handleClickManageSubscription = () => {
+    if (!STRIPE_CUSTOMER_PORTAL) {
+      console.error("stripe customer portal not defined");
+    } else {
+      window.location.href = STRIPE_CUSTOMER_PORTAL;
+      setOpen(false);
+    }
   };
 
   return (
@@ -64,14 +74,9 @@ const AccountDrawer: React.FC<AccountDrawerProps> = ({ isOpen, setOpen }) => {
                   {IsPro(user) ? (
                     <Button
                       variant="contained"
-                      color="error"
-                      sx={{
-                        "&:hover": {
-                          backgroundColor: "error.dark",
-                        },
-                      }}
+                      onClick={handleClickManageSubscription}
                     >
-                      Unsubscribe
+                      Manage Subscription
                     </Button>
                   ) : (
                     <Button variant="contained" onClick={handleClickViewPlans}>

@@ -39,6 +39,10 @@ frontend_host = os.getenv("FRONTEND_HOST")
 if frontend_host is None:
     log.fatal("frontend host env not found. exiting...")
 
+stripe_price_id = os.getenv("STRIPE_PRICE_ID")
+if stripe_price_id is None:
+    log.fatal("stripe price id not found. exiting...")
+
 
 @app.on_event("startup")
 async def startup_event():
@@ -51,7 +55,7 @@ async def createCheckoutSession(id: str = Form(...)):
         checkout_session = stripe.checkout.Session.create(
             line_items=[
                 {
-                    "price": "price_1RxFxkLz81Xps4Dn3ecLGKvv",
+                    "price": stripe_price_id,
                     "quantity": 1,
                 },
             ],
@@ -98,9 +102,20 @@ async def processSubscription(request: Request):
         if not user_id or user_id == "":
             log.error("empty user ID")
             return JSONResponse({"success": False}, 400)
-        log.info(f"USER ID: {user_id}")
+        log.info(f"Creating subscription for user: {user_id}")
         try:
             client.Add_Pro_Role(user_id)
+        except:
+            return JSONResponse({"success": False}, 500)
+    elif event and event["type"] == "customer.subscription.deleted":
+        subscription = event["data"]["object"]
+        user_id = subscription["metadata"].get("user_id")
+        if not user_id or user_id == "":
+            log.error("empty user ID")
+            return JSONResponse({"success": False}, 400)
+        log.info(f"Deleting subscription for user: {user_id}")
+        try:
+            client.Remove_Pro_Role(user_id)
         except:
             return JSONResponse({"success": False}, 500)
     else:
@@ -120,7 +135,7 @@ async def uploadFile(file: UploadFile):
         raise HTTPException(status_code=400, detail="File must be an audio file")
 
     # Validate file size (max 50MB)
-    max_size = 50 * 1024 * 1024  # 50MB in bytes
+    max_size = 50 * 1024 * 1024
     if file.size and file.size > max_size:
         raise HTTPException(status_code=400, detail="File size must be less than 50MB")
 
