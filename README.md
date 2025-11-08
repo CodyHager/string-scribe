@@ -58,8 +58,10 @@ String scribe uses the [FastAPI](https://fastapi.tiangolo.com/) python framework
 | `AUTH0_PRO_ROLE_ID`   | The internal ID that is associated with the `pro` role in Auth0.          |
 
 2. `poetry install`
-   > [!IMPORTANT]
-   > This project requires specific versions of python. On windows, use python `3.10.9`. You might be able to run python `3.11` on other platforms, but this hasn't been tested.
+
+> [!IMPORTANT]
+> This project requires specific versions of python. On windows, use python `3.10.9`. You might be able to run python `3.11` on other platforms, but this hasn't been tested.
+
 3. `poetry run python main.py`
 
 ### Running Frontend (`string-scribe/frontend`)
@@ -79,7 +81,7 @@ String Scribe uses [React](https://react.dev/) and Typescript for its frontend. 
 
 ## Group Members
 
-Theodore Bagley - [https://github.com/TheodoreBagley](github)
+Theodore Bagley - [github](https://github.com/TheodoreBagley)
 
-Cody Hager - [https://github.com/CodyHager](github)
+Cody Hager - [github](https://github.com/CodyHager)
 
