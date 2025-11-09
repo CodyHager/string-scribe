@@ -123,7 +123,7 @@ async def processSubscription(request: Request):
         log.info(f"Deleting subscription for user: {user_id}")
         ## remove Pro role in Auth0
         try:
-            client.Remove_Pro_Role(user_id)
+            client.RemoveProRole(user_id)
         except:
             return JSONResponse({"success": False}, 500)
     else:
