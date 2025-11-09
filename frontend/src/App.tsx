@@ -1,4 +1,3 @@
-import React, { useState } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { ThemeProvider, createTheme, CssBaseline, Box } from "@mui/material";
 import Home from "./pages/Home";
@@ -7,7 +6,6 @@ import Terms from "./pages/Terms";
 import Header from "./components/Header";
 import About from "./pages/About";
 import Subscriptions from "./pages/Subscriptions";
-import AccountDrawer from "./components/AccountDrawer";
 
 // custom MUI theme
 const theme = createTheme({
