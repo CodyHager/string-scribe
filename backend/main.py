@@ -7,6 +7,10 @@ from engine.engine import MusicEngine
 from util import MustGetEnv
 import client.client as client
 
+from dotenv import load_dotenv
+
+load_dotenv()  # reads variables from a .env file and sets them in os.environ
+
 ## instantiate logger
 log = logger.get()
 
