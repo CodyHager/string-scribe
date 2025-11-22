@@ -6,6 +6,10 @@ from fastapi import Form
 from engine.engine import MusicEngine
 from util import MustGetEnv
 import client.client as client
+from dotenv import load_dotenv
+
+## load environment variables from .env file
+load_dotenv()
 
 ## instantiate logger
 log = logger.get()
