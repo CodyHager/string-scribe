@@ -1,11 +1,12 @@
 import json, logger, uvicorn, base64, os, stripe
-from fastapi import FastAPI, UploadFile, HTTPException, Request
-from fastapi.responses import JSONResponse, RedirectResponse, Response
+from fastapi import FastAPI, UploadFile, HTTPException, Request, Response
+from fastapi.responses import JSONResponse, RedirectResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi import Form
 from engine.engine import MusicEngine
 from util import MustGetEnv
 import client.client as client
+from middleware.rate_limit import get_or_create_session_id, check_rate_limit, increment_usage
 
 from dotenv import load_dotenv
 
@@ -37,6 +38,7 @@ app.add_middleware(
     allow_credentials=True,  ## allow cookies
     allow_methods=["*"],  ## allow all methods
     allow_headers=["*"],  ## allow all headers
+    expose_headers=["set-cookie"],  ## expose set-cookie header
 )
 
 
@@ -138,7 +140,33 @@ async def processSubscription(request: Request):
 
 ## endpoint for transcribing a music file
 @app.post("/api/v1/upload")
-async def uploadFile(file: UploadFile):
+async def uploadFile(request: Request, response: Response, file: UploadFile):
+    # Get or create session ID
+    session_id = get_or_create_session_id(request)
+    
+    # Check rate limit
+    is_allowed, remaining, reset_time = check_rate_limit(session_id)
+    
+    if not is_allowed:
+        log.warning(f"Rate limit exceeded for session {session_id}")
+        response.set_cookie(
+            key="session_id",
+            value=session_id,
+            max_age=24*60*60,
+            httponly=True,
+            samesite="lax",
+            secure=False  # Allow on localhost HTTP
+        )
+        print(f"[COOKIE] Setting cookie on 429 response: {session_id}")
+        return JSONResponse(
+            status_code=429,
+            content={
+                "detail": "Translation limit reached. Please subscribe for unlimited access.",
+                "remaining": 0,
+                "reset_time": reset_time
+            }
+        )
+    
     # Validate file exists
     if not file:
         raise HTTPException(status_code=400, detail="No file uploaded")
@@ -155,11 +183,37 @@ async def uploadFile(file: UploadFile):
     # Validate filename
     if not file.filename:
         raise HTTPException(status_code=400, detail="Invalid filename")
+    
     ## get music XML (for creating rendering sheet music) and MIDI (for playing audio)
     mxml, midi = await MusicEngine.ProcessMusic(file)
     ## base64 encode MIDI
     midi_b64 = base64.b64encode(midi).decode("utf-8")
-    return {"mxml": mxml, "midi": midi_b64}
+    
+    # Increment usage count
+    increment_usage(session_id)
+    
+    # Get updated remaining count
+    _, remaining, reset_time = check_rate_limit(session_id)
+    
+    # Set session cookie using Response parameter
+    response.set_cookie(
+        key="session_id",
+        value=session_id,
+        max_age=24*60*60,  # 24 hours
+        httponly=True,
+        samesite="lax",
+        secure=False  # Allow on localhost HTTP
+    )
+    
+    print(f"[COOKIE] Setting cookie on success response: {session_id}")
+    
+    # Return JSON response
+    return {
+        "mxml": mxml,
+        "midi": midi_b64,
+        "remaining": remaining,
+        "reset_time": reset_time
+    }
 
 
 if __name__ == "__main__":

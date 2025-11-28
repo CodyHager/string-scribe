@@ -10,5 +10,6 @@ export const UploadFile = async (fileData: FileUploadType) => {
     headers: {
       "Content-Type": "multipart/form-data",
     },
+    withCredentials: true,  // THIS IS THE KEY LINE - enables cookies
   });
 };
