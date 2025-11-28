@@ -9,28 +9,34 @@ const Home: React.FC = () => {
   const [mxml, setMxml] = useState("");
   const [midi, setMidi] = useState("");
 
-  const handleFileSelect = async (file: File) => {
-    // update loading state
-    setIsLoading(true);
-    // send file to backend for processing
-    UploadFile({ file: file })
-      .then((resp) => {
-        // set MXML and MIDI states
-        if (resp.data?.mxml) {
-          setMxml(resp.data.mxml);
-        }
-        if (resp.data?.midi) {
-          setMidi(resp.data.midi);
-        }
-      })
-      .catch((error) => {
-        console.error(error);
-      })
-      .finally(() => {
-        // remove loading state
-        setIsLoading(false);
-      });
-  };
+const handleFileSelect = async (file: File) => {
+  // update loading state
+  setIsLoading(true);
+  // send file to backend for processing
+  UploadFile({ file: file })
+    .then((resp) => {
+      // set MXML and MIDI states
+      if (resp.data?.mxml) {
+        setMxml(resp.data.mxml);
+      }
+      if (resp.data?.midi) {
+        setMidi(resp.data.midi);
+      }
+    })
+    .catch((error) => {
+      console.error(error);
+      // Handle rate limit error
+      if (error.response?.status === 429) {
+        alert("Translation limit reached. Please subscribe for unlimited access or try again later.");
+      } else {
+        alert("An error occurred while processing your file. Please try again.");
+      }
+    })
+    .finally(() => {
+      // remove loading state
+      setIsLoading(false);
+    });
+};
 
   return (
     <Box sx={{ py: 4 }}>
