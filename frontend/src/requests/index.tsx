@@ -3,14 +3,15 @@ import { FileUploadType } from "../types";
 import { BACKEND_BASE } from "../config";
 
 // upload file to backend
-export const UploadFile = async (fileData: FileUploadType) => {
+export const UploadFile = async (fileData: FileUploadType, isPro: boolean) => {
   const formData = new FormData();
   formData.append("file", fileData.file);
   return axios.post(`${BACKEND_BASE}/api/v1/upload`, formData, {
     headers: {
       "Content-Type": "multipart/form-data",
+      "User-Is-Pro": isPro,
     },
-    withCredentials: true,  // THIS IS THE KEY LINE - enables cookies
+    withCredentials: true,
   });
 };
 

@@ -8,17 +8,27 @@ import MusicViewer from "../components/MusicViewer";
 import { IsPro } from "../util";
 
 const Home: React.FC = () => {
-  const { user } = useAuth0();
+  const { user, isAuthenticated } = useAuth0();
   const [isLoading, setIsLoading] = useState(false);
   const [mxml, setMxml] = useState("");
   const [midi, setMidi] = useState("");
   const isPremium = user ? IsPro(user) : false;
 
+  // decide whether the user is subscribed based on
+  // 1. if they are even signed in
+  // 2. if they have the pro role
+  const hasProAccess = () => {
+    if (!user || !isAuthenticated) {
+      return false;
+    }
+    return IsPro(user);
+  };
+
   const handleFileSelect = async (file: File) => {
     // update loading state
     setIsLoading(true);
     // send file to backend for processing
-    UploadFile({ file: file })
+    UploadFile({ file: file }, hasProAccess())
       .then((resp) => {
         // set MXML and MIDI states
         if (resp.data?.mxml) {

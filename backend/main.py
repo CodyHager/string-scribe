@@ -6,7 +6,11 @@ from fastapi import Form
 from engine.engine import MusicEngine
 from util import MustGetEnv
 import client.client as client
-from middleware.rate_limit import get_or_create_session_id, check_rate_limit, increment_usage
+from middleware.rate_limit import (
+    get_or_create_session_id,
+    check_rate_limit,
+    increment_usage,
+)
 
 from dotenv import load_dotenv
 
@@ -141,32 +145,44 @@ async def processSubscription(request: Request):
 ## endpoint for transcribing a music file
 @app.post("/api/v1/upload")
 async def uploadFile(request: Request, response: Response, file: UploadFile):
-    # Get or create session ID
-    session_id = get_or_create_session_id(request)
-    
-    # Check rate limit
-    is_allowed, remaining, reset_time = check_rate_limit(session_id)
-    
-    if not is_allowed:
-        log.warning(f"Rate limit exceeded for session {session_id}")
-        response.set_cookie(
-            key="session_id",
-            value=session_id,
-            max_age=24*60*60,
-            httponly=True,
-            samesite="lax",
-            secure=False  # Allow on localhost HTTP
-        )
-        print(f"[COOKIE] Setting cookie on 429 response: {session_id}")
-        return JSONResponse(
-            status_code=429,
-            content={
-                "detail": "Translation limit reached. Please subscribe for unlimited access.",
-                "remaining": 0,
-                "reset_time": reset_time
-            }
-        )
-    
+    ## check if user has a pro subscription, will be defined by a header in the request
+    user_is_pro_header = request.headers.get("User-Is-Pro")
+    is_pro = False
+    if user_is_pro_header is not None and bool(user_is_pro_header):
+        is_pro = True
+
+    ## determine whether or not the connection is secure (needed for cookies)
+    secure = request.url.scheme == "https"
+
+    if not is_pro:
+        # Get or create session ID
+        session_id = get_or_create_session_id(request)
+
+        # Check rate limit
+        is_allowed, remaining, reset_time = check_rate_limit(session_id)
+
+        if not is_allowed:
+            log.warning(f"Rate limit exceeded for session {session_id}")
+            response.set_cookie(
+                key="session_id",
+                value=session_id,
+                max_age=24 * 60 * 60,
+                httponly=True,
+                samesite="lax",
+                secure=secure,  # Allow on localhost HTTP
+            )
+            log.info(f"[COOKIE] Setting cookie on 429 response: {session_id}")
+            return JSONResponse(
+                status_code=429,  ## means too many request
+                content={
+                    "detail": "Translation limit reached. Please subscribe for unlimited access.",
+                    "remaining": 0,
+                    "reset_time": reset_time,
+                },
+            )
+    else:
+        log.info("User has the pro role, will skip rate limiting")
+
     # Validate file exists
     if not file:
         raise HTTPException(status_code=400, detail="No file uploaded")
@@ -183,36 +199,35 @@ async def uploadFile(request: Request, response: Response, file: UploadFile):
     # Validate filename
     if not file.filename:
         raise HTTPException(status_code=400, detail="Invalid filename")
-    
+
     ## get music XML (for creating rendering sheet music) and MIDI (for playing audio)
     mxml, midi = await MusicEngine.ProcessMusic(file)
     ## base64 encode MIDI
     midi_b64 = base64.b64encode(midi).decode("utf-8")
-    
-    # Increment usage count
-    increment_usage(session_id)
-    
-    # Get updated remaining count
-    _, remaining, reset_time = check_rate_limit(session_id)
-    
-    # Set session cookie using Response parameter
-    response.set_cookie(
-        key="session_id",
-        value=session_id,
-        max_age=24*60*60,  # 24 hours
-        httponly=True,
-        samesite="lax",
-        secure=False  # Allow on localhost HTTP
-    )
-    
-    print(f"[COOKIE] Setting cookie on success response: {session_id}")
-    
+
+    if not is_pro:
+        # Increment usage count
+        increment_usage(session_id)
+
+        # Get updated remaining count
+        _, remaining, reset_time = check_rate_limit(session_id)
+
+        # Set session cookie using Response parameter
+        response.set_cookie(
+            key="session_id",
+            value=session_id,
+            max_age=24 * 60 * 60,  # 24 hours
+            httponly=True,
+            samesite="lax",
+            secure=secure,  # Allow on localhost HTTP
+        )
+
+        log.info(f"[COOKIE] Setting cookie on success response: {session_id}")
+
     # Return JSON response
     return {
         "mxml": mxml,
         "midi": midi_b64,
-        "remaining": remaining,
-        "reset_time": reset_time
     }
 
 # Endpoint for transcribing a YouTube video (Premium only)
