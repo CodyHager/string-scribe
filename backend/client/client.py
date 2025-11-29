@@ -109,3 +109,34 @@ def getToken() -> str:
     ## refresh 2 minutes early
     TOKEN_EXPIRY = time.time() + expires_in - 180
     return CURRENT_TOKEN
+
+
+# Check if user has Pro role
+def HasProRole(user_id: str) -> bool:
+    try:
+        url = f"{AUTH0_BASE}/api/v2/users/{user_id}/roles"
+        token = getToken()
+        headers = {
+            "Authorization": f"Bearer {token}",
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+        }
+        response = requests.get(url, headers=headers)
+        
+        if response.status_code != 200:
+            error_msg = response.text
+            log.error(
+                f"unexpected response from Auth0 (status {response.status_code}): {error_msg}"
+            )
+            return False
+        
+        roles = response.json()
+        # Check if the pro role is in the user's roles
+        for role in roles:
+            if role.get("id") == AUTH0_PRO_ROLE_ID:
+                return True
+        return False
+        
+    except Exception as err:
+        log.error(f"Error while checking user roles: {err}")
+        return False
