@@ -9,7 +9,8 @@ import { IsPro } from "../util";
 
 const Home: React.FC = () => {
   const { user, isAuthenticated } = useAuth0();
-  const [isLoading, setIsLoading] = useState(false);
+  const [isFileUploadLoading, setIsFileUploadLoading] = useState(false);
+  const [isYoutubeLoading, setIsYoutubeLoading] = useState(false);
   const [mxml, setMxml] = useState("");
   const [midi, setMidi] = useState("");
   const isPremium = user ? IsPro(user) : false;
@@ -26,7 +27,7 @@ const Home: React.FC = () => {
 
   const handleFileSelect = async (file: File) => {
     // update loading state
-    setIsLoading(true);
+    setIsFileUploadLoading(true);
     // send file to backend for processing
     UploadFile({ file: file }, hasProAccess())
       .then((resp) => {
@@ -42,14 +43,18 @@ const Home: React.FC = () => {
         console.error(error);
         // Handle rate limit error
         if (error.response?.status === 429) {
-          alert("Translation limit reached. Please subscribe for unlimited access or try again later.");
+          alert(
+            "Translation limit reached. Please subscribe for unlimited access or try again later.",
+          );
         } else {
-          alert("An error occurred while processing your file. Please try again.");
+          alert(
+            "An error occurred while processing your file. Please try again.",
+          );
         }
       })
       .finally(() => {
         // remove loading state
-        setIsLoading(false);
+        setIsFileUploadLoading(false);
       });
   };
 
@@ -61,7 +66,7 @@ const Home: React.FC = () => {
     }
 
     // update loading state
-    setIsLoading(true);
+    setIsYoutubeLoading(true);
     // send YouTube URL to backend for processing
     UploadYouTube(url, user.sub)
       .then((resp) => {
@@ -77,16 +82,20 @@ const Home: React.FC = () => {
         console.error(error);
         // Handle different error types
         if (error.response?.status === 403) {
-          alert("YouTube transcription is only available for premium subscribers. Please upgrade your account.");
+          alert(
+            "YouTube transcription is only available for premium subscribers. Please upgrade your account.",
+          );
         } else if (error.response?.status === 429) {
           alert("Translation limit reached. Please try again later.");
         } else {
-          alert("An error occurred while processing the YouTube video. Please try again.");
+          alert(
+            "An error occurred while processing the YouTube video. Please try again.",
+          );
         }
       })
       .finally(() => {
         // remove loading state
-        setIsLoading(false);
+        setIsYoutubeLoading(false);
       });
   };
 
@@ -121,20 +130,23 @@ const Home: React.FC = () => {
               lineHeight: 1.6,
             }}
           >
-            Upload an audio file or paste a YouTube URL to generate beautiful violin sheet music using
-            AI-powered transcription
+            Upload an audio file or paste a YouTube URL to generate beautiful
+            violin sheet music using AI-powered transcription
           </Typography>
-          <FileUpload onFileSelect={handleFileSelect} isLoading={isLoading} />
-          
+          <FileUpload
+            onFileSelect={handleFileSelect}
+            isLoading={isFileUploadLoading}
+          />
+
           <Divider sx={{ my: 4 }}>
             <Typography variant="body2" color="text.secondary">
               OR
             </Typography>
           </Divider>
-          
-          <YouTubeUpload 
-            onUrlSubmit={handleYouTubeSubmit} 
-            isLoading={isLoading}
+
+          <YouTubeUpload
+            onUrlSubmit={handleYouTubeSubmit}
+            isLoading={isYoutubeLoading}
             isPremium={isPremium}
           />
         </Box>

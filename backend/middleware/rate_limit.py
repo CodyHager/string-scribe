@@ -1,4 +1,4 @@
-import time
+import time, secrets
 from typing import Dict
 from fastapi import Request
 
@@ -15,8 +15,6 @@ def get_or_create_session_id(request: Request) -> str:
     session_id = request.cookies.get("session_id")
     if not session_id:
         # Generate a simple session ID
-        import secrets
-
         session_id = secrets.token_urlsafe(32)
     print(f"[RATE LIMIT] Session ID: {session_id}")
     print(f"[RATE LIMIT] Current tracker state: {usage_tracker}")

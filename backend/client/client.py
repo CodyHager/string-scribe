@@ -122,21 +122,21 @@ def HasProRole(user_id: str) -> bool:
             "Accept": "application/json",
         }
         response = requests.get(url, headers=headers)
-        
+
         if response.status_code != 200:
             error_msg = response.text
             log.error(
                 f"unexpected response from Auth0 (status {response.status_code}): {error_msg}"
             )
             return False
-        
+
         roles = response.json()
         # Check if the pro role is in the user's roles
         for role in roles:
             if role.get("id") == AUTH0_PRO_ROLE_ID:
                 return True
         return False
-        
+
     except Exception as err:
         log.error(f"Error while checking user roles: {err}")
         return False

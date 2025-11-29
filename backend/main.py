@@ -230,85 +230,43 @@ async def uploadFile(request: Request, response: Response, file: UploadFile):
         "midi": midi_b64,
     }
 
+
 # Endpoint for transcribing a YouTube video (Premium only)
 @app.post("/api/v1/upload-youtube")
-async def uploadYouTube(request: Request, response: Response, url: str = Form(...), user_id: str = Form(...)):
+async def uploadYouTube(
+    request: Request, response: Response, url: str = Form(...), user_id: str = Form(...)
+):
     # Check if user has Pro role
     try:
         has_pro = client.HasProRole(user_id)
         if not has_pro:
             raise HTTPException(
-                status_code=403, 
-                detail="YouTube transcription is only available for premium subscribers. Please upgrade your account."
+                status_code=403,
+                detail="YouTube transcription is only available for premium subscribers. Please upgrade your account.",
             )
     except Exception as e:
         log.error(f"Error checking user role: {e}")
-        raise HTTPException(status_code=500, detail="Failed to verify subscription status")
-    
-    # Get or create session ID
-    session_id = get_or_create_session_id(request)
-    
-    # Check rate limit (same limit as file uploads)
-    is_allowed, remaining, reset_time = check_rate_limit(session_id)
-    
-    if not is_allowed:
-        log.warning(f"Rate limit exceeded for session {session_id}")
-        response.set_cookie(
-            key="session_id",
-            value=session_id,
-            max_age=24*60*60,
-            httponly=True,
-            samesite="lax",
-            secure=False
+        raise HTTPException(
+            status_code=500, detail="Failed to verify subscription status"
         )
-        print(f"[COOKIE] Setting cookie on 429 response: {session_id}")
-        return JSONResponse(
-            status_code=429,
-            content={
-                "detail": "Translation limit reached. Please subscribe for unlimited access.",
-                "remaining": 0,
-                "reset_time": reset_time
-            }
-        )
-    
+
     # Validate URL
     if not url or url.strip() == "":
         raise HTTPException(status_code=400, detail="No URL provided")
-    
+
     try:
         # Download YouTube audio and process it
         mxml, midi = await MusicEngine.ProcessYouTube(url)
         # Base64 encode MIDI
         midi_b64 = base64.b64encode(midi).decode("utf-8")
-        
-        # Increment usage count
-        increment_usage(session_id)
-        
-        # Get updated remaining count
-        _, remaining, reset_time = check_rate_limit(session_id)
-        
-        # Set session cookie
-        response.set_cookie(
-            key="session_id",
-            value=session_id,
-            max_age=24*60*60,
-            httponly=True,
-            samesite="lax",
-            secure=False
-        )
-        
-        print(f"[COOKIE] Setting cookie on success response: {session_id}")
-        
+
         # Return JSON response
-        return {
-            "mxml": mxml,
-            "midi": midi_b64,
-            "remaining": remaining,
-            "reset_time": reset_time
-        }
+        return {"mxml": mxml, "midi": midi_b64}
     except Exception as e:
         log.error(f"Error processing YouTube URL: {e}")
-        raise HTTPException(status_code=500, detail=f"Failed to process YouTube video: {str(e)}")
+        raise HTTPException(
+            status_code=500, detail=f"Failed to process YouTube video: {str(e)}"
+        )
 
 
 if __name__ == "__main__":
