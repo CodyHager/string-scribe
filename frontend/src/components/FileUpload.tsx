@@ -1,16 +1,8 @@
-import React, { useState } from "react";
-import {
-  Box,
-  Button,
-  Typography,
-  Paper,
-  LinearProgress,
-  FormControlLabel,
-  Checkbox,
-  Link,
-} from "@mui/material";
+import React, { useState, useRef } from "react";
+import { Box, Button, Typography, Paper, LinearProgress } from "@mui/material";
 import { CloudUpload } from "@mui/icons-material";
-import { Link as RouterLink } from "react-router-dom";
+import { PurpleGradientHoverSX, PurpleGradientSX } from "../util";
+import TOS from "./TOS";
 
 interface FileUploadProps {
   onFileSelect?: (file: File) => void;
@@ -24,6 +16,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [dragActive, setDragActive] = useState(false);
   const [agreedToTOS, setAgreedToTOS] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // validation before selecting file
   const handleFileSelect = (file: File) => {
@@ -64,6 +57,11 @@ const FileUpload: React.FC<FileUploadProps> = ({
     if (files && files.length > 0) {
       handleFileSelect(files[0]);
     }
+  };
+
+  // handle button click to trigger file input
+  const handleButtonClick = () => {
+    fileInputRef.current?.click();
   };
 
   return (
@@ -124,7 +122,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
       <input
         accept="audio/*"
         style={{ display: "none" }}
-        id="audio-file-input"
+        ref={fileInputRef}
         type="file"
         onChange={handleFileInput}
         disabled={isLoading || !agreedToTOS}
@@ -138,71 +136,31 @@ const FileUpload: React.FC<FileUploadProps> = ({
         }}
       >
         {/* TOS form */}
-        <FormControlLabel
-          control={
-            <Checkbox
-              checked={agreedToTOS}
-              onChange={(e) => setAgreedToTOS(e.target.checked)}
-              color="primary"
-              sx={{
-                "& .MuiSvgIcon-root": {
-                  fontSize: 24,
-                },
-                "&.Mui-checked": {
-                  color: "#667eea",
-                },
-              }}
-            />
-          }
-          label={
-            <Typography variant="body2" color="text.secondary">
-              I agree to the{" "}
-              <Link
-                component={RouterLink}
-                to="/terms"
-                sx={{
-                  color: "#667eea",
-                  textDecoration: "underline",
-                  fontWeight: 500,
-                  "&:hover": {
-                    color: "#5a6fd8",
-                  },
-                }}
-              >
-                Terms of Service
-              </Link>
-            </Typography>
-          }
-          sx={{ mb: 3 }}
-        />
-        <label htmlFor="audio-file-input">
-          <Button
-            variant="contained"
-            component="span"
-            disabled={isLoading || !agreedToTOS}
-            sx={{
-              background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-              fontSize: "1.1rem",
-              px: 4,
-              py: 1.5,
-              borderRadius: 3,
-              boxShadow: "0 4px 16px rgba(102, 126, 234, 0.3)",
-              "&:hover": {
-                background: "linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%)",
-                boxShadow: "0 6px 24px rgba(102, 126, 234, 0.4)",
-                transform: "translateY(-2px)",
-              },
-              "&:disabled": {
-                background: "#e0e0e0",
-                color: "#9e9e9e",
-                boxShadow: "none",
-                transform: "none",
-              },
-            }}
-          >
-            Choose File
-          </Button>
-        </label>
+        <TOS agreed={agreedToTOS} setAgreed={setAgreedToTOS} disabled={false} />
+        <Button
+          variant="contained"
+          onClick={handleButtonClick}
+          disabled={isLoading || !agreedToTOS}
+          sx={{
+            background: PurpleGradientSX,
+            fontSize: "1.1rem",
+            px: 4,
+            py: 1.5,
+            borderRadius: 3,
+            boxShadow: "0 4px 16px rgba(102, 126, 234, 0.3)",
+            "&:hover": {
+              background: PurpleGradientHoverSX,
+              boxShadow: "0 6px 24px rgba(102, 126, 234, 0.4)",
+              transform: "translateY(-2px)",
+            },
+            "&:disabled": {
+              background: "#e0e0e0",
+              color: "#9e9e9e",
+            },
+          }}
+        >
+          Choose File
+        </Button>
       </Box>
       {/* Loading state */}
       {isLoading && (
@@ -221,7 +179,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
               backgroundColor: "rgba(102, 126, 234, 0.1)",
               "& .MuiLinearProgress-bar": {
                 borderRadius: 4,
-                background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                background: PurpleGradientSX,
               },
             }}
           />
@@ -254,13 +212,14 @@ const FileUpload: React.FC<FileUploadProps> = ({
             color="success.main"
             sx={{ fontWeight: 500, mb: 1 }}
           >
-            ✓ Selected: {selectedFile.name}
+            Selected: {selectedFile.name}
           </Typography>
           <Typography
             variant="caption"
             color="text.secondary"
             sx={{ display: "block" }}
           >
+            {/* // divide by 1024 * 1024 because .size is in bytes  */}
             Size: {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
           </Typography>
         </Box>

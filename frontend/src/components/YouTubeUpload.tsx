@@ -8,6 +8,8 @@ import {
   LinearProgress,
 } from "@mui/material";
 import { YouTube } from "@mui/icons-material";
+import TOS from "./TOS";
+import { RedGradientHoverSX, RedGradientSX } from "../util";
 
 interface YouTubeUploadProps {
   onUrlSubmit?: (url: string) => void;
@@ -21,6 +23,7 @@ const YouTubeUpload: React.FC<YouTubeUploadProps> = ({
   isPremium = false,
 }) => {
   const [url, setUrl] = useState("");
+  const [agreedToTOS, setAgreedToTOS] = useState(false);
 
   const handleSubmit = () => {
     if (!url.trim()) {
@@ -81,7 +84,11 @@ const YouTubeUpload: React.FC<YouTubeUploadProps> = ({
           ? "Paste a YouTube URL to transcribe the audio directly"
           : "Upgrade to premium to transcribe YouTube videos"}
       </Typography>
-
+      <TOS
+        agreed={agreedToTOS}
+        setAgreed={setAgreedToTOS}
+        disabled={!isPremium}
+      />
       <Box sx={{ maxWidth: 500, mx: "auto" }}>
         <TextField
           fullWidth
@@ -106,24 +113,22 @@ const YouTubeUpload: React.FC<YouTubeUploadProps> = ({
         <Button
           variant="contained"
           onClick={handleSubmit}
-          disabled={isLoading || !isPremium}
+          disabled={isLoading || !isPremium || !agreedToTOS}
           sx={{
-            background: "linear-gradient(135deg, #FF0000 0%, #CC0000 100%)",
+            background: RedGradientSX,
             fontSize: "1.1rem",
             px: 4,
             py: 1.5,
             borderRadius: 3,
             boxShadow: "0 4px 16px rgba(255, 0, 0, 0.3)",
             "&:hover": {
-              background: "linear-gradient(135deg, #CC0000 0%, #990000 100%)",
+              background: RedGradientHoverSX,
               boxShadow: "0 6px 24px rgba(255, 0, 0, 0.4)",
               transform: "translateY(-2px)",
             },
             "&:disabled": {
               background: "#e0e0e0",
               color: "#9e9e9e",
-              boxShadow: "none",
-              transform: "none",
             },
           }}
         >
@@ -147,7 +152,7 @@ const YouTubeUpload: React.FC<YouTubeUploadProps> = ({
               backgroundColor: "rgba(255, 0, 0, 0.1)",
               "& .MuiLinearProgress-bar": {
                 borderRadius: 4,
-                background: "linear-gradient(135deg, #FF0000 0%, #CC0000 100%)",
+                background: RedGradientSX,
               },
             }}
           />
@@ -160,7 +165,7 @@ const YouTubeUpload: React.FC<YouTubeUploadProps> = ({
               color: "#CC0000",
             }}
           >
-            Downloading and processing YouTube video...
+            Processing YouTube video...
           </Typography>
         </Box>
       )}

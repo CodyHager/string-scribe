@@ -16,3 +16,13 @@ export const IsPro = (user: User): boolean => {
   const roles: string[] = user?.[`${AUTH0_CLAIM_NS}/roles`];
   return roles?.includes("pro");
 };
+
+export const PurpleGradientSX =
+  "linear-gradient(135deg, #667eea 0%, #764ba2 100%)";
+export const PurpleGradientHoverSX =
+  "linear-gradient(135deg, #5568d3 0%, #653a8f 100%)";
+
+export const RedGradientSX =
+  "linear-gradient(135deg, #FF0000 0%, #CC0000 100%)";
+export const RedGradientHoverSX =
+  "linear-gradient(135deg, #CC0000 0%, #990000 100%)";

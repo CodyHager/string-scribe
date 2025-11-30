@@ -1,6 +1,8 @@
 import {
   Box,
   Button,
+  Card,
+  CardContent,
   CircularProgress,
   Divider,
   Paper,
@@ -16,6 +18,7 @@ import CancelIcon from "@mui/icons-material/Cancel";
 import DoDisturbOnIcon from "@mui/icons-material/DoDisturbOn";
 import { IsPro } from "../util";
 import SubscriptionMessages from "../components/SubscriptionMessages";
+import { Person } from "@mui/icons-material";
 
 const Subscriptions: React.FC = () => {
   const { isAuthenticated, user, isLoading } = useAuth0();
@@ -128,7 +131,7 @@ const Subscriptions: React.FC = () => {
                   Icon={<CheckCircleIcon color="success" />}
                 ></SubListItem>
                 <SubListItem
-                  itemText="Transcriptions via YouTube link (coming soon!)"
+                  itemText="Transcriptions via YouTube link"
                   Icon={<CheckCircleIcon color="success" />}
                 ></SubListItem>
                 <SubListItem
@@ -158,14 +161,18 @@ const Subscriptions: React.FC = () => {
         </Stack>
       ) : (
         // Unauthenticated state: user must sign in before they can subscribe
-        <Box textAlign="center">
-          <Typography variant="h4" component="h4" gutterBottom>
-            Please sign in to view subscriptions.
-          </Typography>
-          <Box sx={{ m: "auto" }}>
+        <Card sx={{ backgroundColor: "#c9c9c9", width: "400px" }}>
+          <CardContent sx={{ textAlign: "center", py: 4 }}>
+            <Person sx={{ fontSize: 64, color: "text.secondary", mb: 2 }} />
+            <Typography variant="h6" gutterBottom>
+              Not Signed In
+            </Typography>
+            <Typography variant="body2" color="text.secondary" gutterBottom>
+              Please log in to view subscriptions.
+            </Typography>
             <LoginButton />
-          </Box>
-        </Box>
+          </CardContent>
+        </Card>
       )}
     </Box>
   );

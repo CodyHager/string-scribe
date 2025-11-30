@@ -12,6 +12,7 @@ import { MusicNote, AccountBox } from "@mui/icons-material";
 import { Link as RouterLink } from "react-router-dom";
 import LoginButton from "./LoginButton";
 import AccountDrawer from "./AccountDrawer";
+import { PurpleGradientSX } from "../util";
 
 const Header: React.FC = () => {
   const [accountDrawerOpen, setAccountDrawerOpen] = useState(false);
@@ -41,7 +42,7 @@ const Header: React.FC = () => {
         position="static"
         elevation={0}
         sx={{
-          background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+          background: PurpleGradientSX,
           borderBottom: "1px solid rgba(255, 255, 255, 0.1)",
           backdropFilter: "blur(10px)",
         }}

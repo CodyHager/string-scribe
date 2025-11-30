@@ -8,6 +8,7 @@ import {
   ListItemText,
   Link,
 } from "@mui/material";
+import { PurpleGradientSX } from "../util";
 
 // simple page describing the purpose of String scribe
 
@@ -25,12 +26,9 @@ const About: React.FC = () => {
         <Typography
           variant="h2"
           component="h1"
+          color="#667eea"
           gutterBottom
           sx={{
-            background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-            backgroundClip: "text",
-            WebkitBackgroundClip: "text",
-            WebkitTextFillColor: "transparent",
             fontWeight: 700,
             mb: 2,
           }}

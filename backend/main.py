@@ -14,7 +14,7 @@ from middleware.rate_limit import (
 
 from dotenv import load_dotenv
 
-load_dotenv()  # reads variables from a .env file and sets them in os.environ
+load_dotenv()  # reads variables from a .env file
 
 ## instantiate logger
 log = logger.get()
@@ -144,17 +144,28 @@ async def processSubscription(request: Request):
 
 ## endpoint for transcribing a music file
 @app.post("/api/v1/upload")
-async def uploadFile(request: Request, response: Response, file: UploadFile):
-    ## check if user has a pro subscription, will be defined by a header in the request
-    user_is_pro_header = request.headers.get("User-Is-Pro")
-    is_pro = False
-    if user_is_pro_header is not None and bool(user_is_pro_header):
-        is_pro = True
+async def uploadFile(
+    request: Request,
+    response: Response,
+    file: UploadFile = Form(...),
+    user_id: str = Form(...),
+):
+    ## determine whether or not the user has pro subscription
+    has_pro = False
+    ## if they are not signed in, user ID will be empty string
+    if user_id != "":
+        try:
+            has_pro = client.HasProRole(user_id)
+        except Exception as e:
+            log.error(f"Error checking user role: {e}")
+            raise HTTPException(
+                status_code=500, detail="Failed to verify subscription status"
+            )
 
     ## determine whether or not the connection is secure (needed for cookies)
     secure = request.url.scheme == "https"
 
-    if not is_pro:
+    if not has_pro:
         # Get or create session ID
         session_id = get_or_create_session_id(request)
 
@@ -205,7 +216,7 @@ async def uploadFile(request: Request, response: Response, file: UploadFile):
     ## base64 encode MIDI
     midi_b64 = base64.b64encode(midi).decode("utf-8")
 
-    if not is_pro:
+    if not has_pro:
         # Increment usage count
         increment_usage(session_id)
 
