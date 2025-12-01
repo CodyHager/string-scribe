@@ -10,6 +10,8 @@ interface TOSProps {
   disabled: boolean;
 }
 
+// this is a simple checkbox with a link to the TOS page
+
 const TOS: React.FC<TOSProps> = ({ agreed, setAgreed, disabled }) => {
   return (
     <FormControlLabel

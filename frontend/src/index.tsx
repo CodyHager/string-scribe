@@ -17,6 +17,7 @@ if (!AUTH0_CLIENT_ID) {
 }
 root.render(
   <React.StrictMode>
+    {/* // wrap app in Auth0 provider  */}
     <Auth0Provider
       domain={AUTH0_DOMAIN}
       clientId={AUTH0_CLIENT_ID}

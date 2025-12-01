@@ -8,7 +8,6 @@ import {
   ListItem,
   ListItemText,
 } from "@mui/material";
-import { PurpleGradientSX } from "../util";
 
 // simple page displaying TOS
 

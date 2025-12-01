@@ -14,6 +14,8 @@ import LoginButton from "./LoginButton";
 import AccountDrawer from "./AccountDrawer";
 import { PurpleGradientSX } from "../util";
 
+// component used at the top of all pages
+
 const Header: React.FC = () => {
   const [accountDrawerOpen, setAccountDrawerOpen] = useState(false);
   // simply toggle whether or not the account panel is open

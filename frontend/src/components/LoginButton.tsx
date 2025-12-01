@@ -1,6 +1,8 @@
 import { useAuth0 } from "@auth0/auth0-react";
 import { Box, Button, CircularProgress } from "@mui/material";
 
+// shared component to handle login/logout actions
+
 const LoginButton = () => {
   const { isAuthenticated, loginWithRedirect, logout, isLoading } = useAuth0();
 

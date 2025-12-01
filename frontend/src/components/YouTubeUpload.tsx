@@ -11,6 +11,8 @@ import { YouTube } from "@mui/icons-material";
 import TOS from "./TOS";
 import { RedGradientHoverSX, RedGradientSX } from "../util";
 
+// component for transcribing via YT link
+
 interface YouTubeUploadProps {
   onUrlSubmit?: (url: string) => void;
   isLoading?: boolean;
@@ -52,6 +54,7 @@ const YouTubeUpload: React.FC<YouTubeUploadProps> = ({
         },
       }}
     >
+      {/* // YouTube Icon changes color based on user's subscription  */}
       <YouTube
         sx={{
           fontSize: 64,
@@ -84,12 +87,14 @@ const YouTubeUpload: React.FC<YouTubeUploadProps> = ({
           ? "Paste a YouTube URL to transcribe the audio directly"
           : "Upgrade to premium to transcribe YouTube videos"}
       </Typography>
+      {/* // include TOS  */}
       <TOS
         agreed={agreedToTOS}
         setAgreed={setAgreedToTOS}
         disabled={!isPremium}
       />
       <Box sx={{ maxWidth: 500, mx: "auto" }}>
+        {/* // form for pasting youtube link  */}
         <TextField
           fullWidth
           placeholder="https://www.youtube.com/watch?v=..."
@@ -109,7 +114,7 @@ const YouTubeUpload: React.FC<YouTubeUploadProps> = ({
             },
           }}
         />
-
+        {/* // submit button  */}
         <Button
           variant="contained"
           onClick={handleSubmit}
@@ -135,7 +140,7 @@ const YouTubeUpload: React.FC<YouTubeUploadProps> = ({
           Transcribe YouTube Video
         </Button>
       </Box>
-
+      {/* // loading bar  */}
       {isLoading && (
         <Box
           sx={{

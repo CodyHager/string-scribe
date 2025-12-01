@@ -20,6 +20,8 @@ import { IsPro } from "../util";
 import SubscriptionMessages from "../components/SubscriptionMessages";
 import { Person } from "@mui/icons-material";
 
+// page that displays subscription options
+
 const Subscriptions: React.FC = () => {
   const { isAuthenticated, user, isLoading } = useAuth0();
 
@@ -79,9 +81,10 @@ const Subscriptions: React.FC = () => {
                   objectFit: "contain",
                 }}
               />
+              {/* // subscription features  */}
               <Box textAlign="left">
                 <SubListItem
-                  itemText="Three free transcriptions"
+                  itemText="One free transcription"
                   Icon={<DoDisturbOnIcon color="warning" />}
                 />
                 <SubListItem
@@ -96,6 +99,7 @@ const Subscriptions: React.FC = () => {
               <Typography variant="h4" gutterBottom>
                 Monthly Cost: Free
               </Typography>
+              {/* // hardcode this, since everybody has the free plan  */}
               <Button type="submit" variant="contained" disabled>
                 Free plan activated
               </Button>
@@ -125,6 +129,7 @@ const Subscriptions: React.FC = () => {
                   objectFit: "contain",
                 }}
               />
+              {/* // pro plan features  */}
               <Box textAlign="left">
                 <SubListItem
                   itemText="Unlimited transcriptions"
@@ -142,6 +147,9 @@ const Subscriptions: React.FC = () => {
               <Typography variant="h4" gutterBottom>
                 Monthly Cost: $5.99
               </Typography>
+              {/* // this button initiates the stripe checkout flow
+              // first step of this is hitting the redirect endpoint in our backend
+              // need to use an old-fashioned form here to respect the redirect  */}
               <form
                 action={`${BACKEND_BASE}/api/v1/create-checkout-session`}
                 method="POST"

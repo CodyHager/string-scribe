@@ -29,6 +29,7 @@ const theme = createTheme({
       secondary: "#757575",
     },
   },
+  // text palette
   typography: {
     fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
     h1: {
@@ -59,6 +60,7 @@ const theme = createTheme({
   shape: {
     borderRadius: 12,
   },
+  // button overrides
   components: {
     MuiButton: {
       styleOverrides: {
@@ -91,8 +93,10 @@ function App() {
       <CssBaseline />
       <Router>
         <Box sx={{ minHeight: "100vh", backgroundColor: "background.default" }}>
+          {/* // embed header on all pages  */}
           <Header />
           <Routes>
+            {/* // pages  */}
             <Route path="/" element={<Home />} />
             <Route path="/about" element={<About />} />
             <Route path="/terms" element={<Terms />} />

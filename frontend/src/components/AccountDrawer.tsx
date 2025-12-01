@@ -67,6 +67,7 @@ const AccountDrawer: React.FC<AccountDrawerProps> = ({ isOpen, setOpen }) => {
       }}
     >
       <Box sx={{ height: "100%", display: "flex", flexDirection: "column" }}>
+        {/* // little "X" in the top right corner  */}
         <Box
           sx={{
             background: PurpleGradientSX,

@@ -8,7 +8,6 @@ import {
   ListItemText,
   Link,
 } from "@mui/material";
-import { PurpleGradientSX } from "../util";
 
 // simple page describing the purpose of String scribe
 

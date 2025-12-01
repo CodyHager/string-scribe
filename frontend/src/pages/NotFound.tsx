@@ -2,6 +2,8 @@ import React from "react";
 import { Container, Typography, Box, Button } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 
+// simple 404 page
+
 const NotFound: React.FC = () => {
   const navigate = useNavigate();
 

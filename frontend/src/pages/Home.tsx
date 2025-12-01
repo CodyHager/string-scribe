@@ -6,6 +6,7 @@ import YouTubeUpload from "../components/YouTubeUpload";
 import { UploadFile, UploadYouTube } from "../requests";
 import MusicViewer from "../components/MusicViewer";
 import { IsPro } from "../util";
+import PaywallDialog from "../components/PaywallDialog";
 
 const Home: React.FC = () => {
   const { user } = useAuth0();
@@ -14,6 +15,10 @@ const Home: React.FC = () => {
   const [mxml, setMxml] = useState("");
   const [midi, setMidi] = useState("");
   const isPremium = user ? IsPro(user) : false;
+
+  // dialog state
+  const [dialogMessage, setDialogMessage] = useState("");
+  const [dialogOpen, setDialogOpen] = useState(false);
 
   const handleFileSelect = async (file: File) => {
     // update loading state
@@ -34,9 +39,10 @@ const Home: React.FC = () => {
         console.error(error);
         // Handle rate limit error
         if (error.response?.status === 429) {
-          alert(
-            "Translation limit reached. Please subscribe for unlimited access or try again later.",
+          setDialogMessage(
+            "You've reached your transcription limit. Please subscribe for unlimited access or try again later.",
           );
+          setDialogOpen(true);
         } else {
           alert(
             "An error occurred while processing your file. Please try again.",
@@ -73,11 +79,17 @@ const Home: React.FC = () => {
         console.error(error);
         // Handle different error types
         if (error.response?.status === 403) {
-          alert(
+          setDialogMessage(
             "YouTube transcription is only available for premium subscribers. Please upgrade your account.",
           );
+          setDialogOpen(true);
         } else if (error.response?.status === 429) {
-          alert("Translation limit reached. Please try again later.");
+          // we don't have a rate limit for youtube (since pro subscription is required),
+          // but in case we implement one
+          setDialogMessage(
+            "Transcription limit reached. Please try again later.",
+          );
+          setDialogOpen(true);
         } else {
           alert(
             "An error occurred while processing the YouTube video. Please try again.",
@@ -93,6 +105,7 @@ const Home: React.FC = () => {
   return (
     <Box sx={{ py: 4 }}>
       <Container maxWidth="md">
+        {/* // title text  */}
         <Box sx={{ textAlign: "center", mb: 6 }}>
           <Typography
             variant="h2"
@@ -121,6 +134,7 @@ const Home: React.FC = () => {
             Upload an audio file or paste a YouTube URL to generate beautiful
             violin sheet music using AI-powered transcription
           </Typography>
+          {/* // file upload box  */}
           <FileUpload
             onFileSelect={handleFileSelect}
             isLoading={isFileUploadLoading}
@@ -131,7 +145,7 @@ const Home: React.FC = () => {
               OR
             </Typography>
           </Divider>
-
+          {/* // YouTube upload box  */}
           <YouTubeUpload
             onUrlSubmit={handleYouTubeSubmit}
             isLoading={isYoutubeLoading}
@@ -139,9 +153,16 @@ const Home: React.FC = () => {
           />
         </Box>
       </Container>
+      {/* // music viewer (sheet music and buttons) */}
       <Container maxWidth="lg">
         <MusicViewer selectedMxml={mxml} selectedMidi={midi} />
       </Container>
+      {/* // attach paywall dialog */}
+      <PaywallDialog
+        message={dialogMessage}
+        open={dialogOpen}
+        setOpen={setDialogOpen}
+      />
     </Box>
   );
 };

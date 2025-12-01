@@ -13,6 +13,8 @@ import { Midi } from "@tonejs/midi";
 import * as Tone from "tone";
 import { DecodeBase64Data } from "../util";
 
+// this is the main UI for viewing/exporting sheet music and playing the generated MIDI
+
 interface MusicViewerProps {
   selectedMxml: string;
   selectedMidi: string; //base64 string
@@ -60,6 +62,7 @@ const MusicViewer = ({ selectedMxml, selectedMidi }: MusicViewerProps) => {
     }
   }, [osmd, selectedMxml]);
 
+  // exports pdf of sheet music
   const handleExportPdf = async () => {
     try {
       setIsExporting(true);
@@ -78,6 +81,7 @@ const MusicViewer = ({ selectedMxml, selectedMidi }: MusicViewerProps) => {
     }
   };
 
+  // plays the generated MIDI audio
   const handlePlayMidi = async () => {
     // TODO: handle when midi gets done playing
     if (!isPlayingMidi) {
