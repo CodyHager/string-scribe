@@ -156,6 +156,7 @@ async def download_youtube_audio(url: str) -> str:
     output_path = f"./processing/youtube_{random_id}.mp3"
 
     ydl_opts = {
+        "cookiefile": "./cookies.firefox-private-2.txt",
         ## allows the user to just paste the url
         "noplaylist": True,
         ## get best audio available
@@ -172,6 +173,8 @@ async def download_youtube_audio(url: str) -> str:
         ## verbose errors
         "quiet": False,
         "no_warnings": False,
+        "verbose": True,
+        "print": "cookies",
     }
 
     log.info(f"Downloading audio from YouTube: {url}")

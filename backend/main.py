@@ -24,11 +24,15 @@ STRIPE_SK_ENV = "STRIPE_SK"
 STRIPE_WEBHOOK_SK_ENV = "STRIPE_WEBHOOK_SK"
 STRIPE_PRICE_ID_ENV = "STRIPE_PRICE_ID"
 FRONTEND_HOST_ENV = "FRONTEND_HOST"
+PROD_FLAG_ENV = "PROD"
 
 stripe.api_key = MustGetEnv(STRIPE_SK_ENV)
 webhook_sk = MustGetEnv(STRIPE_WEBHOOK_SK_ENV)
 stripe_price_id = MustGetEnv(STRIPE_PRICE_ID_ENV)
 frontend_host = MustGetEnv(FRONTEND_HOST_ENV)
+prod = MustGetEnv(PROD_FLAG_ENV)
+
+prod_flag = bool(prod)
 
 
 app = FastAPI()
@@ -162,8 +166,13 @@ async def uploadFile(
                 status_code=500, detail="Failed to verify subscription status"
             )
 
-    ## determine whether or not the connection is secure (needed for cookies)
-    secure = request.url.scheme == "https"
+    ## determine whether or not we are on localhost or not
+    ## true for prod (https), false for localhost (http)
+    secure = prod_flag
+    ## determine which mode to use
+    ## none = for fly.io deployment, because it is across multiple domains
+    ## lax = for local development, because it works with http (localhost)
+    same_site = "none" if prod_flag else "lax"
 
     if not has_pro:
         # Get or create session ID
@@ -179,7 +188,7 @@ async def uploadFile(
                 value=session_id,
                 max_age=24 * 60 * 60,
                 httponly=True,
-                samesite="lax",
+                samesite=same_site,
                 secure=secure,  # Allow on localhost HTTP
             )
             log.info(f"[COOKIE] Setting cookie on 429 response: {session_id}")
@@ -229,7 +238,7 @@ async def uploadFile(
             value=session_id,
             max_age=24 * 60 * 60,  # 24 hours
             httponly=True,
-            samesite="lax",
+            samesite=same_site,
             secure=secure,  # Allow on localhost HTTP
         )
 

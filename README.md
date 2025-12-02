@@ -4,6 +4,11 @@ A web app that generates violin sheet music from audio input.
 
 ## Latest deployment: https://stringscribe.com
 
+## Video Demo
+
+Since some of these features are hard to test (for example, subscribing to the pro plan if you don't want to spend actual money),
+we recorded a [video demo](https://montana.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=e3e59be9-b787-43f2-a6bc-b3a7014ed12a&start=0). Note that Stripe was in test mode for this demo, so the payment details were fake and no real transactions were processed, but the flow remains the same. 
+
 ## Overview
 
 Given an audio file, String Scribe uses spotify's [basic pitch](https://github.com/spotify/basic-pitch) algorithm to predict music events and converts it into viewable sheet music using [OSMD](https://github.com/opensheetmusicdisplay/opensheetmusicdisplay). The flow looks something like this:
@@ -56,6 +61,7 @@ String scribe uses the [FastAPI](https://fastapi.tiangolo.com/) python framework
 | `AUTH0_CLIENT_ID`     | Auth0 client ID                                                           |
 | `AUTH0_CLIENT_SECRET` | Auth0 client secret                                                       |
 | `AUTH0_PRO_ROLE_ID`   | The internal ID that is associated with the `pro` role in Auth0.          |
+| `PROD`                | Should be set to `false` for local development.                           |
 
 2. `poetry install`
 
@@ -84,4 +90,3 @@ String Scribe uses [React](https://react.dev/) and Typescript for its frontend. 
 Theodore Bagley - [github](https://github.com/TheodoreBagley)
 
 Cody Hager - [github](https://github.com/CodyHager)
-
