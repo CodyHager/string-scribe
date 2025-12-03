@@ -41,6 +41,14 @@ String Scribe uses [auth0](https://auth0.com/) to manage authorization and authe
 
 String Scribe uses a simple form of [Role Based Access Control](https://auth0.com/docs/manage-users/access-control/rbac) (RBAC) to manage permissions for user subscriptions. If a user is subscribed to the Pro plan, they will have the `pro` role in Auth0 and will be able to access Pro plan features.
 
+### Paywall
+
+Using browser cookies, String Scribe is able to detect whether a user is a Pro member or not. Using this information it is able to restrict the amount of free music translations a user can do and restrict access to premium features. 
+
+### Premium Feature: YouTube Link Upload
+
+The premium feature currently available to Pro members is the ability to upload YouTube links to be translated. Using youtube-dlp, String Scribe 
+
 ## Local development
 
 String Scribe uses separate backend and frontend applications.
