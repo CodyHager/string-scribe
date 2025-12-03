@@ -47,7 +47,7 @@ Using browser cookies, String Scribe is able to detect whether a user is a Pro m
 
 ### Premium Feature: YouTube Link Upload
 
-The premium feature currently available to Pro members is the ability to upload YouTube links to be translated. Using youtube-dlp, String Scribe 
+The premium feature currently available to Pro members is the ability to upload YouTube links to be translated. Using youtube-dlp, String Scribe is able to retrieve MP4 and MP3 file formats of any song hosted on YouTube. The system is then able to use its translation capabilities to produce sheet music of the uploaded YouTube song for the user.
 
 ## Local development
 
